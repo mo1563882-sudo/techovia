@@ -28,7 +28,7 @@
       <div class="tv-preview-card">
         <canvas id="tvCanvas" class="tv-canvas" width="800" height="600" aria-label="معاينة الصورة"></canvas>
         <p class="tv-preview-hint" id="tvPreviewHint">
-          اختر صورة، ثم أدخل الرابط، ثم عدّل إعدادات رمز QR. يمكنك سحب رمز QR فوق الصورة أو تحريكه بأسهم لوحة المفاتيح.
+          اختر صورة، ثم أدخل الرابط، ثم عدّل إعدادات رمز QR. يمكنك سحب رمز QR فوق الصورة.
         </p>
       </div>
     </section>
@@ -184,7 +184,7 @@
 const TV_TEXT = {
   ar: {
     brand: "Techovia",
-    previewHint: "اختر صورة، ثم أدخل الرابط، ثم عدّل إعدادات رمز QR. يمكنك سحب رمز QR فوق الصورة أو تحريكه بأسهم لوحة المفاتيح.",
+    previewHint: "اختر صورة، ثم أدخل الرابط، ثم عدّل إعدادات رمز QR. يمكنك سحب رمز QR فوق الصورة.",
     tabImage: "الصورة",
     tabLink: "الرابط",
     tabQr: "QR",
@@ -240,7 +240,7 @@ const TV_TEXT = {
   },
   en: {
     brand: "Techovia",
-    previewHint: "Select an image, enter the link, then adjust QR settings. You can drag the QR over the image or move it with keyboard arrows.",
+    previewHint: "Select an image, enter the link, then adjust QR settings. You can drag the QR over the image.",
     tabImage: "Image",
     tabLink: "Link",
     tabQr: "QR",
@@ -532,7 +532,7 @@ function tvMakeWhiteTransparent(canvas){
   ctx.putImageData(imgData,0,0);
 }
 
-/* draw preview; يستخدم دائماً وضع QR حتى لو المستخدم اختار clickable، لأن المعاينة تخص QR */
+/* draw preview */
 function tvDraw(){
   const ctx = tvCanvas.getContext('2d');
   ctx.clearRect(0,0,tvCanvas.width,tvCanvas.height);
@@ -560,13 +560,15 @@ function tvDraw(){
   const tctx = tmp.getContext('2d');
   tctx.drawImage(tvQrCache.canvas,0,0);
 
-  const bgOpacity = Number(tvQrBg.value)/100;
-  if(bgOpacity < 1){
+  // منطق خلفية QR: 0 = خلفية ظاهرة، 100 = خلفية شفافة
+  const bgTransparency = Number(tvQrBg.value)/100;      // 0..1
+  const bgAlpha = 1 - bgTransparency;                  // 1..0
+  if(bgAlpha > 0){
     tvMakeWhiteTransparent(tmp);
     const bg = document.createElement('canvas');
     bg.width = tmp.width; bg.height = tmp.height;
     const bgctx = bg.getContext('2d');
-    bgctx.fillStyle = 'rgba(255,255,255,'+bgOpacity+')';
+    bgctx.fillStyle = 'rgba(255,255,255,'+bgAlpha+')';
     bgctx.fillRect(0,0,bg.width,bg.height);
 
     const composed = document.createElement('canvas');
@@ -598,7 +600,7 @@ function tvDraw(){
   const y = Math.round(tvCanvas.height*py - sizePx/2);
 
   ctx.save();
-  ctx.globalAlpha = Number(tvQrAlpha.value)/100;
+  ctx.globalAlpha = Number(tvQrAlpha.value)/100; // 0 = شفاف، 100 = واضح
   ctx.drawImage(tmp, x, y, sizePx, sizePx);
   ctx.restore();
 }
@@ -652,7 +654,7 @@ window.addEventListener('mouseup', ()=>{
   }
 });
 
-/* touch drag (موبايل + شاشات لمس) */
+/* touch drag */
 tvCanvas.addEventListener('touchstart', e=>{
   if(!tvSrcImage) return;
   const touch = e.touches[0];
@@ -740,7 +742,7 @@ tvCanvas.addEventListener('keydown', e=>{
   }
 });
 
-/* slider fill (تم إصلاح المعادلة) */
+/* slider fill */
 function tvUpdateSliderFill(slider){
   const min = slider.min ? Number(slider.min) : 0;
   const max = slider.max ? Number(slider.max) : 100;
@@ -868,13 +870,14 @@ tvGenerateBtn.addEventListener('click', ()=>{
     const tctx = tmp.getContext('2d');
     tctx.drawImage(qrCanvas,0,0);
 
-    const bgOpacity = Number(tvQrBg.value)/100;
-    if(bgOpacity < 1){
+    const bgTransparency = Number(tvQrBg.value)/100;
+    const bgAlpha = 1 - bgTransparency;
+    if(bgAlpha > 0){
       tvMakeWhiteTransparent(tmp);
       const bg = document.createElement('canvas');
       bg.width = tmp.width; bg.height = tmp.height;
       const bgctx = bg.getContext('2d');
-      bgctx.fillStyle = 'rgba(255,255,255,'+bgOpacity+')';
+      bgctx.fillStyle = 'rgba(255,255,255,'+bgAlpha+')';
       bgctx.fillRect(0,0,bg.width,bg.height);
 
       const composed = document.createElement('canvas');
@@ -1010,4 +1013,4 @@ window.addEventListener('resize', ()=>{
 tvSetLang('ar');
 </script>
 </body>
-          </html>
+              </html>
