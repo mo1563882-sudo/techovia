@@ -116,14 +116,14 @@
 
           <label class="tv-label" id="tvLblBg">شفافية خلفية QR (%)</label>
           <div class="tv-slider-row">
-            <!-- 0 = أدنى شفافية (الخلفية مرئية بوضوح) ، 100 = أعلى شفافية (الخلفية غير مرئية) -->
+            <!-- 0 = مرئي 100% ، 100 = غير مرئي 100% -->
             <input type="range" id="tvQrBg" class="tv-slider" min="0" max="100" value="0">
             <span class="tv-slider-value" id="tvQrBgVal">0%</span>
           </div>
 
           <label class="tv-label" id="tvLblAlpha">شفافية رمز QR (%)</label>
           <div class="tv-slider-row">
-            <!-- 0 = QR مرئي تماماً ، 100 = QR غير مرئي -->
+            <!-- 0 = مرئي 100% ، 100 = غير مرئي 100% -->
             <input type="range" id="tvQrAlpha" class="tv-slider" min="0" max="100" value="0">
             <span class="tv-slider-value" id="tvQrAlphaVal">0%</span>
           </div>
@@ -505,13 +505,6 @@ function tvSetLang(lang){
   document.getElementById('tvQrHtmlNote').textContent = t.qrHtmlNote;
   document.getElementById('tvClickableHtmlNote').textContent = t.clickableHtmlNote;
 
-  // تحديث قيم عرض السلايدرات بدون تغيير قيمها الحالية
-  tvQrSizeVal.textContent = tvQrSize.value + '%';
-  tvQrBgVal.textContent = tvQrBg.value + '%';
-  tvQrAlphaVal.textContent = tvQrAlpha.value + '%';
-  tvPosXVal.textContent = tvPosX.value + '%';
-  tvPosYVal.textContent = tvPosY.value + '%';
-
   tvClearUrlError();
 }
 
@@ -620,7 +613,7 @@ function tvDraw(){
   const tctx = tmp.getContext('2d');
   tctx.drawImage(tvQrCache.canvas,0,0);
 
-  // شفافية خلفية QR مستقلة: 0 = خلفية مرئية بالكامل، 100 = خلفية غير مرئية
+  // شفافية خلفية QR: 0 = مرئي 100%، 100 = غير مرئي 100%
   const qrBgSliderVal = Number(tvQrBg.value);
   const qrBgOpacity = 1 - (qrBgSliderVal / 100);
   if(qrBgOpacity > 0){
@@ -658,7 +651,7 @@ function tvDraw(){
   const py = Number(tvPosY.value);
   const pos = tvClampQrPosition(sizePx, tvCanvas.width, tvCanvas.height, px, py);
 
-  // شفافية رمز QR المستقلة: 0 = مرئي تماماً، 100 = غير مرئي
+  // شفافية رمز QR: 0 = مرئي 100%، 100 = غير مرئي 100%
   ctx.save();
   const qrAlphaSliderVal = Number(tvQrAlpha.value);
   const qrAlpha = 1 - (qrAlphaSliderVal / 100);
@@ -1070,7 +1063,7 @@ tvQrCopyHtmlBtn.addEventListener('click', ()=>{
 /* Download QR image button */
 tvQrDownloadBtn.addEventListener('click', tvExportQrImage);
 
-/* init: ضبط القيم الافتراضية دون منع التعديل */
+/* init */
 tvQrSize.value = 30;
 tvQrBg.value = 0;
 tvQrAlpha.value = 0;
@@ -1086,4 +1079,4 @@ tvPosY.value = 0;
 tvSetLang(TV_LANG);
 </script>
 </body>
-    </html>
+</html>
