@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Techovia</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--accent:#0b74ff;--track:#e5e7eb;font-family:system-ui}
+body{margin:0;background:#f6f7f9}
+.tv-app{max-width:1200px;margin:auto;padding:10px}
+header{display:flex;justify-content:space-between;align-items:center}
+.tv-lang-btn{padding:6px 10px;border:0;background:#ddd;border-radius:6px}
+.tv-lang-btn-active{background:var(--accent);color:#fff}
+main{display:grid;grid-template-columns:1fr;gap:10px}
+canvas{width:100%;background:#fff;border-radius:10px}
+.tv-controls-section{background:#fff;padding:10px;border-radius:10px}
+.tv-slider{width:100%}
+html[dir="rtl"] .tv-slider{direction:rtl}
+html[dir="ltr"] .tv-slider{direction:ltr}
+.tv-btn{padding:8px 12px;border-radius:6px;border:0}
+.tv-btn-primary{background:var(--accent);color:#fff}
+.tv-btn-secondary{background:#ddd}
+.tv-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:8px 12px;border-radius:6px;opacity:0;transition:.3s}
+.tv-toast-visible{opacity:1}
+</style>
+</head>
+<body>
+<div class="tv-app">
+<header>
+<strong>Techovia</strong>
+<div>
+<button id="langAr" class="tv-lang-btn">AR</button>
+<button id="langEn" class="tv-lang-btn">EN</button>
+</div>
+</header>
+<main>
+<canvas id="canvas" width="800" height="600"></canvas>
+<div class="tv-controls-section">
+<label>URL</label>
+<input id="url" placeholder="https://example.com" style="width:100%"><br><br>
+<label>QR Opacity</label>
+<input type="range" id="qrAlpha" min="0" max="100" value="0">
+<label>QR Background Opacity</label>
+<input type="range" id="qrBg" min="0" max="100" value="0">
+<br><br>
+<button id="reset" class="tv-btn tv-btn-secondary">Reset</button>
+</div>
+</main>
+<div id="toast" class="tv-toast"></div>
+<div id="qrHidden" style="display:none"></div>
+<script>
+const userLang=navigator.language.startsWith('ar')?'ar':'en';
+setLang(userLang);
+function setLang(l){
+document.documentElement.lang=l;
+document.documentElement.dir=l==='ar'?'rtl':'ltr';
+langAr.classList.toggle('tv-lang-btn-active',l==='ar');
+langEn.classList.toggle('tv-lang-btn-active',l==='en');
+}
+langAr.onclick=()=>setLang('ar');
+langEn.onclick=()=>setLang('en');
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+const qrHidden=document.getElementById('qrHidden');
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+const link=url.value.trim();
+if(!link.startsWith('http'))return;
+qrHidden.innerHTML='';
+new QRCode(qrHidden,{text:link,width:300,height:300});
+const qr=qrHidden.querySelector('canvas');
+if(!qr)return;
+const bgAlpha=1-(qrBg.value/100);
+const qrAlpha=1-(qrAlpha.value/100);
+const x=(canvas.width-300)/2;
+const y=(canvas.height-300)/2;
+if(bgAlpha>0){
+ctx.save();ctx.globalAlpha=bgAlpha;ctx.fillStyle='#fff';
+ctx.fillRect(x,y,300,300);ctx.restore();
+}
+ctx.save();ctx.globalAlpha=qrAlpha;
+ctx.drawImage(qr,x,y,300,300);ctx.restore();
+}
+[url,qrAlpha,qrBg].forEach(el=>el.oninput=draw);
+reset.onclick=()=>{
+url.value='';qrAlpha.value=0;qrBg.value=0;draw();toast('Reset done');
+};
+function toast(t){
+const el=document.getElementById('toast');
+el.textContent=t;el.classList.add('tv-toast-visible');
+setTimeout(()=>el.classList.remove('tv-toast-visible'),2000);
+}
+</script>
+</div>
+</body>
+</html>
