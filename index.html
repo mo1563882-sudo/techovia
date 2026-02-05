@@ -12,7 +12,6 @@
 <div class="tv-app">
   <header class="tv-header">
     <div class="tv-brand">
-      <!-- استخدم شعارك المرفق -->
       <img id="tvLogo" src="technovia_site_icon.jpeg" alt="Techovia" onerror="tvBrandFallback(this)">
       <span class="tv-brand-name" id="tvBrandName">Techovia</span>
     </div>
@@ -39,7 +38,8 @@
         <button type="button" class="tv-tab tv-tab-active" data-tab="image" id="tvTabImage">الصورة</button>
         <button type="button" class="tv-tab" data-tab="link" id="tvTabLink">الرابط</button>
         <button type="button" class="tv-tab" data-tab="qr" id="tvTabQr">QR</button>
-        <button type="button" class="tv-tab" data-tab="export" id="tvTabExport">التصدير</button>
+        <button type="button" class="tv-tab" data-tab="clickable" id="tvTabClickable">صورة قابلة للنقر</button>
+        <button type="button" class="tv-tab" data-tab="download" id="tvTabDownload">تحميل</button>
       </div>
 
       <div class="tv-panels">
@@ -77,32 +77,52 @@
 
           <label class="tv-label" id="tvLblSize">حجم QR (%)</label>
           <div class="tv-slider-row">
-            <input type="range" id="tvQrSize" class="tv-slider" min="5" max="60" value="20">
+            <input type="range" id="tvQrSize" class="tv-slider" min="0" max="100" value="20">
             <span class="tv-slider-value" id="tvQrSizeVal">20%</span>
           </div>
 
           <label class="tv-label" id="tvLblBg">شفافية خلفية QR (%)</label>
           <div class="tv-slider-row">
-            <input type="range" id="tvQrBg" class="tv-slider" min="0" max="100" value="100">
-            <span class="tv-slider-value" id="tvQrBgVal">100%</span>
+            <input type="range" id="tvQrBg" class="tv-slider" min="0" max="100" value="0">
+            <span class="tv-slider-value" id="tvQrBgVal">0%</span>
           </div>
 
           <label class="tv-label" id="tvLblAlpha">شفافية رمز QR (%)</label>
           <div class="tv-slider-row">
-            <input type="range" id="tvQrAlpha" class="tv-slider" min="20" max="100" value="100">
+            <input type="range" id="tvQrAlpha" class="tv-slider" min="0" max="100" value="100">
             <span class="tv-slider-value" id="tvQrAlphaVal">100%</span>
           </div>
 
           <label class="tv-label" id="tvLblPosX">الموضع الأفقي (%)</label>
           <div class="tv-slider-row">
-            <input type="range" id="tvPosX" class="tv-slider" min="0" max="100" value="80">
-            <span class="tv-slider-value" id="tvPosXVal">80%</span>
+            <input type="range" id="tvPosX" class="tv-slider" min="0" max="100" value="0">
+            <span class="tv-slider-value" id="tvPosXVal">0%</span>
           </div>
 
           <label class="tv-label" id="tvLblPosY">الموضع الرأسي (%)</label>
           <div class="tv-slider-row">
-            <input type="range" id="tvPosY" class="tv-slider" min="0" max="100" value="80">
-            <span class="tv-slider-value" id="tvPosYVal">80%</span>
+            <input type="range" id="tvPosY" class="tv-slider" min="0" max="100" value="0">
+            <span class="tv-slider-value" id="tvPosYVal">0%</span>
+          </div>
+
+          <label class="tv-label" id="tvLblQrFormat">صيغة الصورة مع QR</label>
+          <div class="tv-radio-row">
+            <label>
+              <input type="radio" name="tvQrFormat" value="png" checked>
+              PNG
+            </label>
+            <label>
+              <input type="radio" name="tvQrFormat" value="webp">
+              WEBP
+            </label>
+            <label>
+              <input type="radio" name="tvQrFormat" value="jpeg">
+              JPEG
+            </label>
+            <label>
+              <input type="radio" name="tvQrFormat" value="gif">
+              GIF
+            </label>
           </div>
 
           <div class="tv-note" id="tvQuietNote">
@@ -117,8 +137,46 @@
           </div>
         </div>
 
-        <!-- Panel: Export -->
-        <div class="tv-panel" id="tvPanelExport">
+        <!-- Panel: Clickable Image (no QR) -->
+        <div class="tv-panel" id="tvPanelClickable">
+          <p class="tv-note" id="tvClickableInfo">
+            في هذا التبويب يتم إنشاء صورة قابلة للنقر بدون رمز QR، مع دمج الرابط داخل كود HTML.
+          </p>
+
+          <label class="tv-label" id="tvLblClickableFormat">صيغة الصورة</label>
+          <div class="tv-radio-row">
+            <label>
+              <input type="radio" name="tvClickableFormat" value="png" checked>
+              PNG
+            </label>
+            <label>
+              <input type="radio" name="tvClickableFormat" value="webp">
+              WEBP
+            </label>
+            <label>
+              <input type="radio" name="tvClickableFormat" value="jpeg">
+              JPEG
+            </label>
+            <label>
+              <input type="radio" name="tvClickableFormat" value="gif">
+              GIF
+            </label>
+          </div>
+
+          <div class="tv-export-options">
+            <label>
+              <input type="checkbox" id="tvClickableCopyHtml" checked>
+              <span id="tvLblClickableCopyHtml">نسخ كود HTML إلى الحافظة</span>
+            </label>
+          </div>
+
+          <div class="tv-actions">
+            <button type="button" class="tv-btn tv-btn-primary" id="tvGenerateClickableBtn">إنشاء وتحميل</button>
+          </div>
+        </div>
+
+        <!-- Panel: Download (image with/without QR) -->
+        <div class="tv-panel" id="tvPanelDownload">
           <label class="tv-label" id="tvLblMode">نوع الإخراج</label>
           <div class="tv-radio-row">
             <label>
@@ -126,8 +184,8 @@
               <span id="tvLblModeQr">صورة مع QR (للاستخدام البصري)</span>
             </label>
             <label>
-              <input type="radio" name="tvMode" value="clickable">
-              <span id="tvLblModeClickable">صورة قابلة للنقر بدون QR (HTML للمدونات والمواقع)</span>
+              <input type="radio" name="tvMode" value="plain">
+              <span id="tvLblModePlain">صورة بدون QR</span>
             </label>
           </div>
 
@@ -145,29 +203,23 @@
               <input type="radio" name="tvFormat" value="jpeg">
               JPEG
             </label>
+            <label>
+              <input type="radio" name="tvFormat" value="gif">
+              GIF
+            </label>
           </div>
 
-          <div class="tv-note" id="tvClickableNote">
-            الصورة القابلة للنقر هي صورة عادية بدون QR مدمجة داخل كود HTML، صالحة للاستخدام في المواقع والمدونات.
-          </div>
-
-          <div class="tv-export-options">
-            <label>
-              <input type="checkbox" id="tvExportHtml" checked>
-              <span id="tvLblExportHtml">تصدير ملف HTML للصورة القابلة للنقر</span>
-            </label>
-            <label>
-              <input type="checkbox" id="tvExportCopyHtml">
-              <span id="tvLblExportCopyHtml">نسخ كود HTML إلى الحافظة</span>
-            </label>
+          <div class="tv-note" id="tvDownloadNote">
+            سيتم تحميل الصورة وفق إعداداتك الحالية، مع أو بدون QR حسب اختيار نوع الإخراج.
           </div>
 
           <div class="tv-actions">
             <button type="button" class="tv-btn tv-btn-ghost" id="tvResetBtn">إعادة ضبط</button>
-            <button type="button" class="tv-btn tv-btn-primary" id="tvGenerateBtn">إنشاء وتصدير</button>
+            <button type="button" class="tv-btn tv-btn-primary" id="tvGenerateBtn">إنشاء وتحميل</button>
             <button type="button" class="tv-btn tv-btn-secondary" id="tvPreviewDownloadBtn" style="display:none">تحميل المعاينة</button>
           </div>
         </div>
+
       </div>
     </section>
   </main>
@@ -188,7 +240,8 @@ const TV_TEXT = {
     tabImage: "الصورة",
     tabLink: "الرابط",
     tabQr: "QR",
-    tabExport: "التصدير",
+    tabClickable: "صورة قابلة للنقر",
+    tabDownload: "تحميل",
 
     lblImage: "اختر الصورة",
     noImage: "لم يتم اختيار ملف",
@@ -217,18 +270,22 @@ const TV_TEXT = {
     logoBtn: "اختر شعار",
     noLogo: "بدون شعار",
 
+    lblQrFormat: "صيغة الصورة مع QR",
+
+    clickableInfo: "في هذا التبويب يتم إنشاء صورة قابلة للنقر بدون رمز QR، مع دمج الرابط داخل كود HTML.",
+    lblClickableFormat: "صيغة الصورة",
+    lblClickableCopyHtml: "نسخ كود HTML إلى الحافظة",
+    btnGenerateClickable: "إنشاء وتحميل",
+
     lblMode: "نوع الإخراج",
     modeQr: "صورة مع QR (للاستخدام البصري)",
-    modeClickable: "صورة قابلة للنقر بدون QR (HTML للمدونات والمواقع)",
+    modePlain: "صورة بدون QR",
 
     lblFormat: "صيغة الصورة",
-    clickableNote: "الصورة القابلة للنقر هي صورة عادية بدون QR مدمجة داخل كود HTML، صالحة للاستخدام في المواقع والمدونات.",
-
-    lblExportHtml: "تصدير ملف HTML للصورة القابلة للنقر",
-    lblExportCopyHtml: "نسخ كود HTML إلى الحافظة",
+    downloadNote: "سيتم تحميل الصورة وفق إعداداتك الحالية، مع أو بدون QR حسب اختيار نوع الإخراج.",
 
     btnReset: "إعادة ضبط",
-    btnGenerate: "إنشاء وتصدير",
+    btnGenerate: "إنشاء وتحميل",
     btnPreviewDownload: "تحميل المعاينة",
 
     toastCopyOk: "تم نسخ كود HTML إلى الحافظة.",
@@ -244,7 +301,8 @@ const TV_TEXT = {
     tabImage: "Image",
     tabLink: "Link",
     tabQr: "QR",
-    tabExport: "Export",
+    tabClickable: "Clickable image",
+    tabDownload: "Download",
 
     lblImage: "Choose image",
     noImage: "No file chosen",
@@ -273,18 +331,22 @@ const TV_TEXT = {
     logoBtn: "Choose logo",
     noLogo: "No logo",
 
+    lblQrFormat: "Image format with QR",
+
+    clickableInfo: "In this tab you generate a clickable image without QR, wrapping the link in HTML code.",
+    lblClickableFormat: "Image format",
+    lblClickableCopyHtml: "Copy HTML code to clipboard",
+    btnGenerateClickable: "Generate & download",
+
     lblMode: "Output type",
     modeQr: "Image with QR (visual use)",
-    modeClickable: "Clickable image without QR (HTML for blogs/sites)",
+    modePlain: "Image without QR",
 
     lblFormat: "Image format",
-    clickableNote: "Clickable image is a normal image without QR wrapped in HTML, suitable for websites/blogs.",
-
-    lblExportHtml: "Export HTML file for clickable image",
-    lblExportCopyHtml: "Copy HTML code to clipboard",
+    downloadNote: "The image will be downloaded according to your current settings, with or without QR.",
 
     btnReset: "Reset",
-    btnGenerate: "Generate & export",
+    btnGenerate: "Generate & download",
     btnPreviewDownload: "Download preview",
 
     toastCopyOk: "HTML code copied to clipboard.",
@@ -334,11 +396,16 @@ const tvLogoBtn = document.getElementById('tvLogoBtn');
 const tvLogoName = document.getElementById('tvLogoName');
 const tvLogoInput = document.getElementById('tvLogoInput');
 
+const tvQrFormatRadios = document.querySelectorAll('input[name="tvQrFormat"]');
+
+const tvClickableInfo = document.getElementById('tvClickableInfo');
+const tvClickableFormatRadios = document.querySelectorAll('input[name="tvClickableFormat"]');
+const tvClickableCopyHtml = document.getElementById('tvClickableCopyHtml');
+const tvGenerateClickableBtn = document.getElementById('tvGenerateClickableBtn');
+
 const tvModeRadios = document.querySelectorAll('input[name="tvMode"]');
 const tvFormatRadios = document.querySelectorAll('input[name="tvFormat"]');
-const tvClickableNote = document.getElementById('tvClickableNote');
-const tvExportHtml = document.getElementById('tvExportHtml');
-const tvExportCopyHtml = document.getElementById('tvExportCopyHtml');
+const tvDownloadNote = document.getElementById('tvDownloadNote');
 
 const tvResetBtn = document.getElementById('tvResetBtn');
 const tvGenerateBtn = document.getElementById('tvGenerateBtn');
@@ -353,6 +420,7 @@ let tvLogoImg = null;
 let tvQrCache = null;
 let tvDragging = false;
 let tvDragOffset = {x:0,y:0};
+let tvShowQrOnPreview = true; // يتحكم إذا كان QR يظهر في المعاينة
 
 function tvBrandFallback(img){
   img.onerror = null;
@@ -405,6 +473,14 @@ function tvGetFormat(){
   const r = Array.from(tvFormatRadios).find(r=>r.checked);
   return r ? r.value : 'png';
 }
+function tvGetQrFormat(){
+  const r = Array.from(tvQrFormatRadios).find(r=>r.checked);
+  return r ? r.value : 'png';
+}
+function tvGetClickableFormat(){
+  const r = Array.from(tvClickableFormatRadios).find(r=>r.checked);
+  return r ? r.value : 'png';
+}
 
 function tvSetLang(lang){
   TV_LANG = lang;
@@ -422,7 +498,8 @@ function tvSetLang(lang){
   document.getElementById('tvTabImage').textContent = t.tabImage;
   document.getElementById('tvTabLink').textContent = t.tabLink;
   document.getElementById('tvTabQr').textContent = t.tabQr;
-  document.getElementById('tvTabExport').textContent = t.tabExport;
+  document.getElementById('tvTabClickable').textContent = t.tabClickable;
+  document.getElementById('tvTabDownload').textContent = t.tabDownload;
 
   document.getElementById('tvLblImage').textContent = t.lblImage;
   tvImageBtn.textContent = t.imageBtn;
@@ -449,14 +526,19 @@ function tvSetLang(lang){
   tvLogoBtn.textContent = t.logoBtn;
   if(!tvLogoImg) tvLogoName.textContent = t.noLogo;
 
+  document.getElementById('tvLblQrFormat').textContent = t.lblQrFormat;
+
+  tvClickableInfo.textContent = t.clickableInfo;
+  document.getElementById('tvLblClickableFormat').textContent = t.lblClickableFormat;
+  document.getElementById('tvLblClickableCopyHtml').textContent = t.lblClickableCopyHtml;
+  tvGenerateClickableBtn.textContent = t.btnGenerateClickable;
+
   document.getElementById('tvLblMode').textContent = t.lblMode;
   document.getElementById('tvLblModeQr').textContent = t.modeQr;
-  document.getElementById('tvLblModeClickable').textContent = t.modeClickable;
+  document.getElementById('tvLblModePlain').textContent = t.modePlain;
 
   document.getElementById('tvLblFormat').textContent = t.lblFormat;
-  tvClickableNote.textContent = t.clickableNote;
-  document.getElementById('tvLblExportHtml').textContent = t.lblExportHtml;
-  document.getElementById('tvLblExportCopyHtml').textContent = t.lblExportCopyHtml;
+  tvDownloadNote.textContent = t.downloadNote;
 
   tvResetBtn.textContent = t.btnReset;
   tvGenerateBtn.textContent = t.btnGenerate;
@@ -532,6 +614,22 @@ function tvMakeWhiteTransparent(canvas){
   ctx.putImageData(imgData,0,0);
 }
 
+/* clamp QR inside image when drawing */
+function tvClampQrPosition(sizePx, canvasWidth, canvasHeight, pxPercent, pyPercent){
+  let cx = (pxPercent/100) * canvasWidth;
+  let cy = (pyPercent/100) * canvasHeight;
+
+  if(cx - sizePx/2 < 0) cx = sizePx/2;
+  if(cx + sizePx/2 > canvasWidth) cx = canvasWidth - sizePx/2;
+  if(cy - sizePx/2 < 0) cy = sizePx/2;
+  if(cy + sizePx/2 > canvasHeight) cy = canvasHeight - sizePx/2;
+
+  return {
+    x: Math.round(cx - sizePx/2),
+    y: Math.round(cy - sizePx/2)
+  };
+}
+
 /* draw preview */
 function tvDraw(){
   const ctx = tvCanvas.getContext('2d');
@@ -542,6 +640,8 @@ function tvDraw(){
 
   const link = tvUrlInput.value.trim();
   if(!tvIsValidUrl(link)) return;
+
+  if(!tvShowQrOnPreview) return; // في تبويب صورة قابلة للنقر، لا نعرض QR
 
   const sizePercent = Number(tvQrSize.value);
   const sizePx = Math.round(tvCanvas.width * (sizePercent/100));
@@ -560,9 +660,12 @@ function tvDraw(){
   const tctx = tmp.getContext('2d');
   tctx.drawImage(tvQrCache.canvas,0,0);
 
-  // منطق خلفية QR: 0 = خلفية ظاهرة، 100 = خلفية شفافة
-  const bgTransparency = Number(tvQrBg.value)/100;      // 0..1
-  const bgAlpha = 1 - bgTransparency;                  // 1..0
+  // منطق شفافية خلفية QR:
+  // AR: 0 = خلفية مرئية (أقل شفافية)، 100 = خلفية غير مرئية (أعلى شفافية)
+  // EN: 0 = background visible, 100 = fully transparent
+  const bgSliderVal = Number(tvQrBg.value);
+  const bgAlpha = 1 - (bgSliderVal / 100); // 0..1
+
   if(bgAlpha > 0){
     tvMakeWhiteTransparent(tmp);
     const bg = document.createElement('canvas');
@@ -594,29 +697,42 @@ function tvDraw(){
     tctx.restore();
   }
 
-  const px = Number(tvPosX.value)/100;
-  const py = Number(tvPosY.value)/100;
-  const x = Math.round(tvCanvas.width*px - sizePx/2);
-  const y = Math.round(tvCanvas.height*py - sizePx/2);
+  let px = Number(tvPosX.value);
+  let py = Number(tvPosY.value);
+
+  // العربية: السلايدر من اليمين لليسار، 0 أقصى اليمين/أسفل، 100 أقصى اليسار/أعلى
+  // الإنجليزية: من اليسار لليمين (القيم كما هي)
+  if(TV_LANG === 'ar'){
+    px = 100 - px;
+    py = 100 - py;
+  }
+
+  const pos = tvClampQrPosition(sizePx, tvCanvas.width, tvCanvas.height, px, py);
 
   ctx.save();
-  ctx.globalAlpha = Number(tvQrAlpha.value)/100; // 0 = شفاف، 100 = واضح
-  ctx.drawImage(tmp, x, y, sizePx, sizePx);
+  ctx.globalAlpha = Number(tvQrAlpha.value)/100;
+  ctx.drawImage(tmp, pos.x, pos.y, sizePx, sizePx);
   ctx.restore();
 }
 
 /* mouse drag */
 tvCanvas.addEventListener('mousedown', e=>{
-  if(!tvSrcImage) return;
+  if(!tvSrcImage || !tvShowQrOnPreview) return;
   const rect = tvCanvas.getBoundingClientRect();
   const mx = e.clientX - rect.left;
   const my = e.clientY - rect.top;
 
   const sizePx = Math.round(tvCanvas.width * (Number(tvQrSize.value)/100));
-  const px = Number(tvPosX.value)/100;
-  const py = Number(tvPosY.value)/100;
-  const x = Math.round(tvCanvas.width*px - sizePx/2);
-  const y = Math.round(tvCanvas.height*py - sizePx/2);
+
+  let px = Number(tvPosX.value);
+  let py = Number(tvPosY.value);
+  if(TV_LANG === 'ar'){
+    px = 100 - px;
+    py = 100 - py;
+  }
+  const pos = tvClampQrPosition(sizePx, tvCanvas.width, tvCanvas.height, px, py);
+  const x = pos.x;
+  const y = pos.y;
 
   if(mx>=x && mx<=x+sizePx && my>=y && my<=y+sizePx){
     tvDragging = true;
@@ -639,8 +755,16 @@ window.addEventListener('mousemove', e=>{
 
   const cx = nx + sizePx/2;
   const cy = ny + sizePx/2;
-  tvPosX.value = Math.round((cx / tvCanvas.width)*100);
-  tvPosY.value = Math.round((cy / tvCanvas.height)*100);
+  let px = Math.round((cx / tvCanvas.width)*100);
+  let py = Math.round((cy / tvCanvas.height)*100);
+
+  if(TV_LANG === 'ar'){
+    px = 100 - px;
+    py = 100 - py;
+  }
+
+  tvPosX.value = px;
+  tvPosY.value = py;
   tvPosXVal.textContent = tvPosX.value + '%';
   tvPosYVal.textContent = tvPosY.value + '%';
   tvUpdateSliderFill(tvPosX);
@@ -656,7 +780,7 @@ window.addEventListener('mouseup', ()=>{
 
 /* touch drag */
 tvCanvas.addEventListener('touchstart', e=>{
-  if(!tvSrcImage) return;
+  if(!tvSrcImage || !tvShowQrOnPreview) return;
   const touch = e.touches[0];
   if(!touch) return;
   const rect = tvCanvas.getBoundingClientRect();
@@ -664,10 +788,16 @@ tvCanvas.addEventListener('touchstart', e=>{
   const my = touch.clientY - rect.top;
 
   const sizePx = Math.round(tvCanvas.width * (Number(tvQrSize.value)/100));
-  const px = Number(tvPosX.value)/100;
-  const py = Number(tvPosY.value)/100;
-  const x = Math.round(tvCanvas.width*px - sizePx/2);
-  const y = Math.round(tvCanvas.height*py - sizePx/2);
+
+  let px = Number(tvPosX.value);
+  let py = Number(tvPosY.value);
+  if(TV_LANG === 'ar'){
+    px = 100 - px;
+    py = 100 - py;
+  }
+  const pos = tvClampQrPosition(sizePx, tvCanvas.width, tvCanvas.height, px, py);
+  const x = pos.x;
+  const y = pos.y;
 
   if(mx>=x && mx<=x+sizePx && my>=y && my<=y+sizePx){
     tvDragging = true;
@@ -694,8 +824,16 @@ tvCanvas.addEventListener('touchmove', e=>{
 
   const cx = nx + sizePx/2;
   const cy = ny + sizePx/2;
-  tvPosX.value = Math.round((cx / tvCanvas.width)*100);
-  tvPosY.value = Math.round((cy / tvCanvas.height)*100);
+  let px = Math.round((cx / tvCanvas.width)*100);
+  let py = Math.round((cy / tvCanvas.height)*100);
+
+  if(TV_LANG === 'ar'){
+    px = 100 - px;
+    py = 100 - py;
+  }
+
+  tvPosX.value = px;
+  tvPosY.value = py;
   tvPosXVal.textContent = tvPosX.value + '%';
   tvPosYVal.textContent = tvPosY.value + '%';
   tvUpdateSliderFill(tvPosX);
@@ -714,25 +852,34 @@ tvCanvas.addEventListener('touchend', ()=>{
 /* keyboard move */
 tvCanvas.tabIndex = 0;
 tvCanvas.addEventListener('keydown', e=>{
-  if(!tvSrcImage) return;
+  if(!tvSrcImage || !tvShowQrOnPreview) return;
   let step = e.shiftKey ? 5 : 1;
   let changed = false;
 
+  let xVal = Number(tvPosX.value);
+  let yVal = Number(tvPosY.value);
+
   if(e.key === 'ArrowLeft'){
-    tvPosX.value = Math.max(0, Number(tvPosX.value)-step);
+    if(TV_LANG === 'ar') xVal = Math.min(100, xVal+step);
+    else xVal = Math.max(0, xVal-step);
     changed = true;
   }else if(e.key === 'ArrowRight'){
-    tvPosX.value = Math.min(100, Number(tvPosX.value)+step);
+    if(TV_LANG === 'ar') xVal = Math.max(0, xVal-step);
+    else xVal = Math.min(100, xVal+step);
     changed = true;
   }else if(e.key === 'ArrowUp'){
-    tvPosY.value = Math.max(0, Number(tvPosY.value)-step);
+    if(TV_LANG === 'ar') yVal = Math.max(0, yVal-step);
+    else yVal = Math.min(100, yVal+step);
     changed = true;
   }else if(e.key === 'ArrowDown'){
-    tvPosY.value = Math.min(100, Number(tvPosY.value)+step);
+    if(TV_LANG === 'ar') yVal = Math.min(100, yVal+step);
+    else yVal = Math.max(0, yVal-step);
     changed = true;
   }
 
   if(changed){
+    tvPosX.value = xVal;
+    tvPosY.value = yVal;
     tvPosXVal.textContent = tvPosX.value + '%';
     tvPosYVal.textContent = tvPosY.value + '%';
     tvUpdateSliderFill(tvPosX);
@@ -768,8 +915,20 @@ function tvUpdateSliderFill(slider){
 tvTabs.forEach(tab=>{
   tab.addEventListener('click', ()=>{
     const target = tab.dataset.tab;
+
+    // التحكم بعرض QR في المعاينة
+    if(target === 'clickable'){
+      tvShowQrOnPreview = false;
+    } else {
+      tvShowQrOnPreview = true;
+    }
+
     tvTabs.forEach(t=> t.classList.toggle('tv-tab-active', t===tab));
-    tvPanels.forEach(p=> p.classList.toggle('tv-panel-active', p.id === 'tvPanel'+target.charAt(0).toUpperCase()+target.slice(1)));
+    tvPanels.forEach(p=>{
+      const id = 'tvPanel' + target.charAt(0).toUpperCase() + target.slice(1);
+      p.classList.toggle('tv-panel-active', p.id === id);
+    });
+    tvDraw();
   });
 });
 
@@ -833,7 +992,8 @@ tvPreviewDownloadBtn.addEventListener('click', ()=>{
   }, 'image/png', 0.95);
 });
 
-tvGenerateBtn.addEventListener('click', ()=>{
+/* common export function (with optional QR) */
+function tvExportImage(withQr, formatOverride){
   const link = tvUrlInput.value.trim();
   if(!tvSrcImage || !tvIsValidUrl(link)){
     tvShowUrlError(TV_TEXT[TV_LANG].urlError);
@@ -842,8 +1002,7 @@ tvGenerateBtn.addEventListener('click', ()=>{
   }
   tvClearUrlError();
 
-  const mode = tvGetMode();   // qr أو clickable
-  const format = tvGetFormat(); // png / webp / jpeg
+  const format = formatOverride || tvGetFormat();
   const quality = 0.95;
 
   const outCanvas = document.createElement('canvas');
@@ -852,8 +1011,7 @@ tvGenerateBtn.addEventListener('click', ()=>{
   outCanvas.height = tvSrcImage.naturalHeight;
   octx.drawImage(tvSrcImage,0,0,outCanvas.width,outCanvas.height);
 
-  if(mode === 'qr'){
-    // نضيف QR على الصورة
+  if(withQr){
     const sizePercent = Number(tvQrSize.value);
     const sizePx = Math.round(outCanvas.width * (sizePercent/100));
 
@@ -870,8 +1028,8 @@ tvGenerateBtn.addEventListener('click', ()=>{
     const tctx = tmp.getContext('2d');
     tctx.drawImage(qrCanvas,0,0);
 
-    const bgTransparency = Number(tvQrBg.value)/100;
-    const bgAlpha = 1 - bgTransparency;
+    const bgSliderVal = Number(tvQrBg.value);
+    const bgAlpha = 1 - (bgSliderVal / 100);
     if(bgAlpha > 0){
       tvMakeWhiteTransparent(tmp);
       const bg = document.createElement('canvas');
@@ -903,20 +1061,75 @@ tvGenerateBtn.addEventListener('click', ()=>{
       tctx.restore();
     }
 
-    const px = Number(tvPosX.value)/100;
-    const py = Number(tvPosY.value)/100;
-    const x = Math.round(outCanvas.width*px - sizePx/2);
-    const y = Math.round(outCanvas.height*py - sizePx/2);
+    let px = Number(tvPosX.value);
+    let py = Number(tvPosY.value);
+    if(TV_LANG === 'ar'){
+      px = 100 - px;
+      py = 100 - py;
+    }
+
+    const pos = tvClampQrPosition(sizePx, outCanvas.width, outCanvas.height, px, py);
 
     octx.save();
     octx.globalAlpha = Number(tvQrAlpha.value)/100;
-    octx.drawImage(tmp, x, y, sizePx, sizePx);
+    octx.drawImage(tmp, pos.x, pos.y, sizePx, sizePx);
     octx.restore();
   }
 
   let mime = 'image/png';
   if(format === 'webp') mime = 'image/webp';
   else if(format === 'jpeg') mime = 'image/jpeg';
+  else if(format === 'gif') mime = 'image/gif';
+
+  outCanvas.toBlob(blob=>{
+    if(!blob){
+      alert('Export error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const dataUrl = reader.result;
+      const aImg = document.createElement('a');
+      aImg.href = dataUrl;
+      aImg.download = 'techovia-image.' + (format==='jpeg'?'jpg':format);
+      document.body.appendChild(aImg);
+      aImg.click();
+      aImg.remove();
+    };
+    reader.readAsDataURL(blob);
+  }, mime, quality);
+}
+
+/* Generate (Download tab) */
+tvGenerateBtn.addEventListener('click', ()=>{
+  const mode = tvGetMode();   // qr أو plain
+  const withQr = (mode === 'qr');
+  tvExportImage(withQr);
+});
+
+/* Generate clickable image (no QR, HTML embed) */
+tvGenerateClickableBtn.addEventListener('click', ()=>{
+  const link = tvUrlInput.value.trim();
+  if(!tvSrcImage || !tvIsValidUrl(link)){
+    tvShowUrlError(TV_TEXT[TV_LANG].urlError);
+    alert(TV_TEXT[TV_LANG].alertMissing);
+    return;
+  }
+  tvClearUrlError();
+
+  const format = tvGetClickableFormat();
+  const quality = 0.95;
+
+  const outCanvas = document.createElement('canvas');
+  const octx = outCanvas.getContext('2d');
+  outCanvas.width = tvSrcImage.naturalWidth;
+  outCanvas.height = tvSrcImage.naturalHeight;
+  octx.drawImage(tvSrcImage,0,0,outCanvas.width,outCanvas.height);
+
+  let mime = 'image/png';
+  if(format === 'webp') mime = 'image/webp';
+  else if(format === 'jpeg') mime = 'image/jpeg';
+  else if(format === 'gif') mime = 'image/gif';
 
   outCanvas.toBlob(blob=>{
     if(!blob){
@@ -928,44 +1141,33 @@ tvGenerateBtn.addEventListener('click', ()=>{
       const dataUrl = reader.result;
       const imgTitle = tvTitleInput.value.trim() || TV_TEXT[TV_LANG].htmlTitle;
       const imgAlt = tvAltInput.value.trim() || TV_TEXT[TV_LANG].htmlAlt;
-
-      const aImg = document.createElement('a');
-      aImg.href = dataUrl;
-      aImg.download = 'techovia-image.' + (format==='jpeg'?'jpg':format);
-      document.body.appendChild(aImg);
-      aImg.click();
-      aImg.remove();
-
-      if(mode === 'clickable'){
-        const safeUrl = link.replace(/"/g,'&quot;');
-        const html = `<!doctype html>
+      const safeUrl = link.replace(/"/g,'&quot;');
+      const html = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <a href="${safeUrl}" target="_blank" rel="noopener noreferrer">
   <img src="${dataUrl}" alt="${imgAlt.replace(/"/g,'&quot;')}" title="${imgTitle.replace(/"/g,'&quot;')}" style="max-width:100%;height:auto;border:0">
 </a>`;
 
-        if(tvExportHtml.checked){
-          const blobHtml = new Blob([html], {type:'text/html'});
-          const aHtml = document.createElement('a');
-          aHtml.href = URL.createObjectURL(blobHtml);
-          aHtml.download = 'techovia-clickable-image.html';
-          document.body.appendChild(aHtml);
-          aHtml.click();
-          aHtml.remove();
-        }
-        if(tvExportCopyHtml.checked && navigator.clipboard){
-          navigator.clipboard.writeText(html).then(
-            ()=> tvShowToast(TV_TEXT[TV_LANG].toastCopyOk),
-            ()=> tvShowToast(TV_TEXT[TV_LANG].toastCopyFail)
-          );
-        }
+      const aImg = document.createElement('a');
+      aImg.href = dataUrl;
+      aImg.download = 'techovia-clickable-image.' + (format==='jpeg'?'jpg':format);
+      document.body.appendChild(aImg);
+      aImg.click();
+      aImg.remove();
+
+      if(tvClickableCopyHtml.checked && navigator.clipboard){
+        navigator.clipboard.writeText(html).then(
+          ()=> tvShowToast(TV_TEXT[TV_LANG].toastCopyOk),
+          ()=> tvShowToast(TV_TEXT[TV_LANG].toastCopyFail)
+        );
       }
     };
     reader.readAsDataURL(blob);
   }, mime, quality);
 });
 
+/* Reset */
 tvResetBtn.addEventListener('click', ()=>{
   tvSrcImage = null;
   tvLogoImg = null;
@@ -985,21 +1187,25 @@ tvResetBtn.addEventListener('click', ()=>{
   tvThemeSelect.value = 'default';
 
   tvQrSize.value = 20; tvQrSizeVal.textContent = '20%'; tvUpdateSliderFill(tvQrSize);
-  tvQrBg.value = 100; tvQrBgVal.textContent = '100%'; tvUpdateSliderFill(tvQrBg);
+  tvQrBg.value = 0; tvQrBgVal.textContent = '0%'; tvUpdateSliderFill(tvQrBg);
   tvQrAlpha.value = 100; tvQrAlphaVal.textContent = '100%'; tvUpdateSliderFill(tvQrAlpha);
-  tvPosX.value = 80; tvPosXVal.textContent = '80%'; tvUpdateSliderFill(tvPosX);
-  tvPosY.value = 80; tvPosYVal.textContent = '80%'; tvUpdateSliderFill(tvPosY);
+  tvPosX.value = 0; tvPosXVal.textContent = '0%'; tvUpdateSliderFill(tvPosX);
+  tvPosY.value = 0; tvPosYVal.textContent = '0%'; tvUpdateSliderFill(tvPosY);
 
   tvModeRadios.forEach(r=> r.checked = (r.value === 'qr'));
   tvFormatRadios.forEach(r=> r.checked = (r.value === 'png'));
-  tvExportHtml.checked = true;
-  tvExportCopyHtml.checked = false;
+  tvQrFormatRadios.forEach(r=> r.checked = (r.value === 'png'));
+  tvClickableFormatRadios.forEach(r=> r.checked = (r.value === 'png'));
+
+  tvClickableCopyHtml.checked = true;
 
   const ctx = tvCanvas.getContext('2d');
   ctx.clearRect(0,0,tvCanvas.width,tvCanvas.height);
   tvPreviewDownloadBtn.style.display = 'none';
+  tvShowQrOnPreview = true;
 });
 
+/* Resize */
 window.addEventListener('resize', ()=>{
   if(tvSrcImage){
     const maxW = Math.min(1200, window.innerWidth - 40);
@@ -1013,4 +1219,4 @@ window.addEventListener('resize', ()=>{
 tvSetLang('ar');
 </script>
 </body>
-              </html>
+          </html>
