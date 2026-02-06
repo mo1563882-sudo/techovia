@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Studio — النسخة الكاملة</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>QR Studio — النسخة الكاملة</header>
+
+<div class="container">
+
+    <div class="section-title">النص / الرابط</div>
+    <input id="qr-text" type="text" placeholder="أدخل نص أو رابط">
+
+    <div class="section-title">الألوان</div>
+    <div class="row">
+        <div>
+            <label>لون النقاط</label>
+            <input id="qr-color" type="color" value="#000000">
+        </div>
+        <div>
+            <label>لون الخلفية</label>
+            <input id="qr-bg" type="color" value="#ffffff">
+        </div>
+    </div>
+
+    <div class="section-title">الحجم</div>
+    <select id="qr-size">
+        <option value="256">256px</option>
+        <option value="512">512px</option>
+        <option value="1024">1024px</option>
+    </select>
+
+    <div class="section-title">رفع لوجو (اختياري)</div>
+    <div class="logo-upload" onclick="document.getElementById('logo-input').click()">
+        اضغط لرفع لوجو
+    </div>
+    <input id="logo-input" type="file" accept="image/*" style="display:none">
+
+    <button class="btn" onclick="generateQR()">إنشاء QR</button>
+
+    <div id="preview-area"></div>
+
+    <div class="tools">
+        <button onclick="downloadPNG()">PNG</button>
+        <button onclick="downloadSVG()">SVG</button>
+        <button onclick="downloadWEBP()">WEBP</button>
+        <button onclick="downloadPDF()">PDF</button>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+
+let lastSVG = "";
+let logoImage = null;
+
+/* ===========================
+   تحميل اللوجو + معاينة مباشرة
+   =========================== */
+document.getElementById("logo-input").addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(ev){
+        logoImage = new Image();
+        logoImage.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+/* ===========================
+   توليد QR + دمج اللوجو
+   =========================== */
+function generateQR() {
+    const text = document.getElementById("qr-text").value.trim();
+    const color = document.getElementById("qr-color").value;
+    const bg = document.getElementById("qr-bg").value;
+    const size = parseInt(document.getElementById("qr-size").value);
+
+    if (!text) {
+        alert("أدخل نص أولاً");
+        return;
+    }
+
+    const preview = document.getElementById("preview-area");
+    preview.innerHTML = "";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    preview.appendChild(canvas);
+
+    QRCode.toCanvas(canvas, text, {
+        width: size,
+        color: { dark: color, light: bg }
+    }, function(){
+        if (logoImage) {
+            const ctx = canvas.getContext("2d");
+            const logoSize = size * 0.22;
+            ctx.drawImage(logoImage, (size - logoSize)/2, (size - logoSize)/2, logoSize, logoSize);
+        }
+    });
+
+    QRCode.toString(text, {
+        type: "svg",
+        color: { dark: color, light: bg }
+    }, function(err, svg){
+        if (!err) lastSVG = svg;
+    });
+}
+
+/* ===========================
+   تحميل PNG
+   =========================== */
+function downloadPNG() {
+    const canvas = document.querySelector("#preview-area canvas");
+    if (!canvas) return;
+
+    const link = document.createElement("a");
+    link.download = "qr.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+}
+
+/* ===========================
+   تحميل SVG
+   =========================== */
+function downloadSVG() {
+    if (!lastSVG) return;
+
+    const blob = new Blob([lastSVG], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "qr.svg";
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+/* ===========================
+   تحميل WEBP
+   =========================== */
+function downloadWEBP() {
+    const canvas = document.querySelector("#preview-area canvas");
+    if (!canvas) return;
+
+    const link = document.createElement("a");
+    link.download = "qr.webp";
+    link.href = canvas.toDataURL("image/webp");
+    link.click();
+}
+
+/* ===========================
+   تحميل PDF
+   =========================== */
+function downloadPDF() {
+    const canvas = document.querySelector("#preview-area canvas");
+    if (!canvas) return;
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jspdf.jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width, canvas.height]
+    });
+
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+    pdf.save("qr.pdf");
+}
+
+</script>
+
+</body>
+              </html> 
