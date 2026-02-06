@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QR Studio — النسخة الكاملة</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="title">QR Studio — النسخة الكاملة (Sora 2 UI)</div>
+    <div class="controls">
+      <button id="langToggle" class="btn ghost">EN</button>
+      <button id="saveTemplate" class="btn">حفظ قالب</button>
+      <button id="loadTemplate" class="btn ghost">تحميل قالب</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- LEFT: Types -->
+    <aside class="panel" id="typesPanel">
+      <div class="section-title">نوع الـ QR</div>
+      <div class="type-list" id="typeList">
+        <!-- items injected by JS -->
+      </div>
+
+      <div style="height:12px"></div>
+      <div class="section-title">قوالب سريعة</div>
+      <div class="type-list">
+        <div class="type-item" onclick="applyQuick('https://example.com')">رابط موقع</div>
+        <div class="type-item" onclick="applyQuick('WIFI')">Wi‑Fi مثال</div>
+        <div class="type-item" onclick="applyQuick('VCARD')">بطاقة شخصية مثال</div>
+      </div>
+    </aside>
+
+    <!-- CENTER: Preview -->
+    <section class="canvas-area">
+      <div class="section-title">المعاينة الحية</div>
+
+      <div class="preview-wrap">
+        <div class="preview-canvas" id="previewCanvasWrap">
+          <!-- canvas inserted here -->
+        </div>
+
+        <div class="preview-meta">
+          <div class="meta-row">
+            <label>النص / الرابط</label>
+            <input id="qr-text" class="input" placeholder="أدخل نص أو اختر نوع" />
+          </div>
+
+          <div class="meta-row">
+            <label>الحجم</label>
+            <select id="qr-size" class="input">
+              <option value="256">256px</option>
+              <option value="512" selected>512px</option>
+              <option value="1024">1024px</option>
+            </select>
+          </div>
+
+          <div class="meta-row">
+            <label>أوضاع التصدير</label>
+            <div style="display:flex;gap:8px">
+              <button class="btn" onclick="downloadPNG()">PNG</button>
+              <button class="btn ghost" onclick="downloadSVG()">SVG</button>
+              <button class="btn" onclick="downloadWEBP()">WEBP</button>
+              <button class="btn ghost" onclick="downloadPDF()">PDF</button>
+            </div>
+          </div>
+
+          <div class="meta-row">
+            <label>نسخ</label>
+            <div style="display:flex;gap:8px">
+              <button class="btn ghost" onclick="copyImage()">نسخ للصق</button>
+              <button class="btn ghost" onclick="copyHTML()">نسخ كود HTML</button>
+            </div>
+          </div>
+
+          <div class="meta-row">
+            <label>فحص قابلية المسح</label>
+            <div id="scanCheck" class="note">لم يتم الفحص</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-top:12px">
+        <button class="btn" onclick="generateQR()">تحديث المعاينة</button>
+        <div class="note">التغييرات تحدث فورياً عند تعديل الحقول</div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Styling & Logo -->
+    <aside class="panel controls-panel">
+      <div class="control-group">
+        <div class="section-title">ألوان</div>
+        <div class="control-row">
+          <label style="min-width:90px">لون النقاط</label>
+          <input id="qr-color" type="color" value="#000000" />
+        </div>
+        <div class="control-row" style="margin-top:8px">
+          <label style="min-width:90px">لون الخلفية</label>
+          <input id="qr-bg" type="color" value="#ffffff" />
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="section-title">الشكل</div>
+        <div class="control-row">
+          <label style="min-width:90px">نمط النقاط</label>
+          <select id="moduleStyle" class="input">
+            <option value="square">مربّع</option>
+            <option value="rounded">دائري ناعم</option>
+            <option value="dot">نقطة</option>
+          </select>
+        </div>
+        <div class="control-row" style="margin-top:8px">
+          <label style="min-width:90px">نمط العيون</label>
+          <select id="eyeStyle" class="input">
+            <option value="square">مربّع</option>
+            <option value="circle">دائري</option>
+            <option value="rounded">مستدير</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="section-title">خلفية و لوجو</div>
+        <div class="control-row">
+          <label style="min-width:90px">خلفية صورة</label>
+          <input id="bgImageInput" type="file" accept="image/*" />
+        </div>
+
+        <div style="height:8px"></div>
+
+        <div class="control-row">
+          <label style="min-width:90px">لوجو</label>
+          <input id="logoInput" type="file" accept="image/*" />
+        </div>
+
+        <div style="height:8px"></div>
+        <div class="note">اسحب اللوجو داخل المعاينة لتغيير موضعه. استخدم الأسهم لتحريك دقيق.</div>
+      </div>
+
+      <div class="control-group">
+        <div class="section-title">خيارات متقدمة</div>
+        <div class="control-row">
+          <label style="min-width:90px">هامش المسح (Quiet Zone)</label>
+          <input id="quietZone" type="number" class="input" value="4" min="0" />
+        </div>
+        <div style="height:8px"></div>
+        <div class="control-row">
+          <label style="min-width:90px">جودة WEBP</label>
+          <input id="webpQuality" type="range" min="0.1" max="1" step="0.1" value="0.9" />
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+/* ====== App State ====== */
+const TYPES = [
+  { id:'url', label:'رابط (URL)', fields:[{k:'url',label:'الرابط',type:'text'}] },
+  { id:'text', label:'نص عادي', fields:[{k:'text',label:'النص',type:'textarea'}] },
+  { id:'wifi', label:'Wi‑Fi', fields:[
+      {k:'ssid',label:'SSID',type:'text'},
+      {k:'password',label:'كلمة المرور',type:'text'},
+      {k:'encryption',label:'التشفير',type:'select',options:['WPA','WEP','nopass']}
+    ]},
+  { id:'vcard', label:'بطاقة شخصية (vCard)', fields:[
+      {k:'fn',label:'الاسم الكامل',type:'text'},
+      {k:'org',label:'المنظمة',type:'text'},
+      {k:'tel',label:'الهاتف',type:'text'},
+      {k:'email',label:'البريد',type:'text'},
+      {k:'url',label:'الموقع',type:'text'},
+    ]},
+  { id:'sms', label:'رسالة SMS', fields:[
+      {k:'phone',label:'رقم الهاتف',type:'text'},
+      {k:'message',label:'الرسالة',type:'textarea'}
+    ]},
+  { id:'email', label:'بريد إلكتروني', fields:[
+      {k:'to',label:'إلى',type:'text'},
+      {k:'subject',label:'الموضوع',type:'text'},
+      {k:'body',label:'المحتوى',type:'textarea'}
+    ]},
+  { id:'geo', label:'موقع (Geo)', fields:[
+      {k:'lat',label:'خط العرض',type:'text'},
+      {k:'lng',label:'خط الطول',type:'text'}
+    ]},
+  { id:'event', label:'حدث (Event)', fields:[
+      {k:'title',label:'العنوان',type:'text'},
+      {k:'start',label:'بداية (YYYY-MM-DD HH:MM)',type:'text'},
+      {k:'end',label:'نهاية (YYYY-MM-DD HH:MM)',type:'text'},
+      {k:'location',label:'المكان',type:'text'},
+      {k:'desc',label:'الوصف',type:'textarea'}
+    ]},
+  { id:'app', label:'رابط تطبيق (App Link)', fields:[
+      {k:'ios',label:'iOS URL',type:'text'},
+      {k:'android',label:'Android URL',type:'text'},
+      {k:'fallback',label:'Fallback URL',type:'text'}
+    ]},
+  { id:'pdf', label:'PDF (رفع ملف)', fields:[
+      {k:'file',label:'اختر ملف PDF',type:'file',accept:'application/pdf'}
+    ]}
+];
+
+let state = {
+  type: 'url',
+  fields: {},
+  size:512,
+  color:'#000000',
+  bg:'#ffffff',
+  moduleStyle:'square',
+  eyeStyle:'square',
+  logoImage:null,
+  logoPos:{x:0.5,y:0.5,scale:0.22,rot:0},
+  bgImage:null,
+  quietZone:4,
+  webpQuality:0.9,
+  lastSVG:'',
+  lang:'ar'
+};
+
+/* ====== DOM refs ====== */
+const typeListEl = document.getElementById('typeList');
+const qrTextInput = document.getElementById('qr-text');
+const previewWrap = document.getElementById('previewCanvasWrap');
+const scanCheckEl = document.getElementById('scanCheck');
+
+/* ====== Init UI ====== */
+function init(){
+  // types
+  TYPES.forEach(t=>{
+    const el = document.createElement('div');
+    el.className='type-item'+(t.id===state.type?' active':'');
+    el.innerHTML = `<div style="flex:1">${t.label}</div>`;
+    el.onclick = ()=>selectType(t.id);
+    typeListEl.appendChild(el);
+  });
+
+  // bind controls
+  document.getElementById('qr-size').addEventListener('change', e=>{ state.size=parseInt(e.target.value); generateQR(); });
+  document.getElementById('qr-color').addEventListener('input', e=>{ state.color=e.target.value; generateQR(); });
+  document.getElementById('qr-bg').addEventListener('input', e=>{ state.bg=e.target.value; generateQR(); });
+  document.getElementById('moduleStyle').addEventListener('change', e=>{ state.moduleStyle=e.target.value; generateQR(); });
+  document.getElementById('eyeStyle').addEventListener('change', e=>{ state.eyeStyle=e.target.value; generateQR(); });
+  document.getElementById('logoInput').addEventListener('change', handleLogoUpload);
+  document.getElementById('bgImageInput').addEventListener('change', handleBgUpload);
+  document.getElementById('quietZone').addEventListener('input', e=>{ state.quietZone=parseInt(e.target.value); generateQR(); });
+  document.getElementById('webpQuality').addEventListener('input', e=>{ state.webpQuality=parseFloat(e.target.value); });
+
+  document.getElementById('langToggle').addEventListener('click', toggleLang);
+  document.getElementById('saveTemplate').addEventListener('click', saveTemplate);
+  document.getElementById('loadTemplate').addEventListener('click', loadTemplate);
+
+  // initial canvas
+  createCanvas();
+  renderTypeForm();
+  generateQR();
+}
+init();
+
+/* ====== Type selection & form rendering ====== */
+function selectType(id){
+  state.type=id;
+  // update active
+  Array.from(typeListEl.children).forEach((c,i)=>c.classList.toggle('active', TYPES[i].id===id));
+  renderTypeForm();
+  generateQR();
+}
+
+function renderTypeForm(){
+  // clear existing extra fields area (we'll reuse qr-text input for simple)
+  const type = TYPES.find(t=>t.id===state.type);
+  // build a small form below qr-text
+  const existing = document.getElementById('dynamicFields');
+  if (existing) existing.remove();
+
+  const container = document.createElement('div');
+  container.id='dynamicFields';
+  container.style.marginTop='10px';
+  container.style.display='flex';
+  container.style.flexDirection='column';
+  container.style.gap='8px';
+
+  type.fields.forEach(f=>{
+    const row = document.createElement('div');
+    row.className='control-row';
+    const label = document.createElement('label');
+    label.style.minWidth='90px';
+    label.textContent = f.label;
+    row.appendChild(label);
+
+    let input;
+    if (f.type==='select'){
+      input = document.createElement('select');
+      input.className='input';
+      f.options.forEach(opt=>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; input.appendChild(o); });
+    } else if (f.type==='file'){
+      input = document.createElement('input');
+      input.type='file';
+      if (f.accept) input.accept = f.accept;
+      input.className='input';
+    } else if (f.type==='textarea'){
+      input = document.createElement('textarea');
+      input.className='input';
+      input.rows=3;
+    } else {
+      input = document.createElement('input');
+      input.type='text';
+      input.className='input';
+    }
+
+    input.dataset.key = f.k;
+    input.oninput = ()=>{ state.fields[f.k] = input.value; generateQR(); };
+    if (f.type==='file'){
+      input.onchange = (e)=>{ state.fields[f.k] = e.target.files[0]; generateQR(); };
+    }
+
+    row.appendChild(input);
+    container.appendChild(row);
+  });
+
+  // insert after qr-text
+  qrTextInput.parentNode.insertBefore(container, qrTextInput.nextSibling);
+}
+
+/* ====== Quick apply (examples) ====== */
+function applyQuick(tag){
+  if(tag==='WIFI'){
+    selectType('wifi');
+    // prefill
+    setTimeout(()=>{
+      document.querySelector('[data-key="ssid"]').value='MyNetwork';
+      document.querySelector('[data-key="password"]').value='password123';
+      document.querySelector('[data-key="encryption"]').value='WPA';
+      state.fields.ssid='MyNetwork';
+      state.fields.password='password123';
+      state.fields.encryption='WPA';
+      generateQR();
+    },50);
+    return;
+  }
+  if(tag==='VCARD'){
+    selectType('vcard');
+    setTimeout(()=>{
+      document.querySelector('[data-key="fn"]').value='Yousef Alami';
+      document.querySelector('[data-key="tel"]').value='+33123456789';
+      state.fields.fn='Yousef Alami';
+      state.fields.tel='+33123456789';
+      generateQR();
+    },50);
+    return;
+  }
+  // else URL
+  selectType('url');
+  qrTextInput.value = tag;
+  state.fields.url = tag;
+  generateQR();
+}
+
+/* ====== Canvas creation & drawing ====== */
+let canvas, ctx;
+function createCanvas(){
+  previewWrap.innerHTML = '';
+  canvas = document.createElement('canvas');
+  canvas.width = state.size;
+  canvas.height = state.size;
+  canvas.style.width = '100%';
+  canvas.style.height = 'auto';
+  canvas.tabIndex = 0;
+  previewWrap.appendChild(canvas);
+  ctx = canvas.getContext('2d');
+
+  // logo drag handlers
+  canvas.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('keydown', onKeyDown);
+}
+
+/* pointer drag state */
+let dragging=false, dragStart=null;
+
+function onPointerDown(e){
+  // if pointer inside logo bounds -> start drag
+  const rect = canvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) * (canvas.width/rect.width);
+  const py = (e.clientY - rect.top) * (canvas.height/rect.height);
+  const lp = logoCanvasPos();
+  if(lp && px>=lp.x && px<=lp.x+lp.w && py>=lp.y && py<=lp.y+lp.h){
+    dragging=true;
+    dragStart={x:px,y:py,ox:state.logoPos.x,oy:state.logoPos.y};
+    e.preventDefault();
+  }
+}
+function onPointerUp(){ dragging=false; dragStart=null; }
+function onPointerMove(e){
+  if(!dragging) return;
+  const rect = canvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) * (canvas.width/rect.width);
+  const py = (e.clientY - rect.top) * (canvas.height/rect.height);
+  const dx = (px - dragStart.x)/canvas.width;
+  const dy = (py - dragStart.y)/canvas.height;
+  state.logoPos.x = Math.min(0.9, Math.max(0.1, dragStart.ox + dx));
+  state.logoPos.y = Math.min(0.9, Math.max(0.1, dragStart.oy + dy));
+  drawCanvas();
+}
+
+/* keyboard arrows for fine move */
+function onKeyDown(e){
+  if(!state.logoImage) return;
+  const step = (e.shiftKey?0.02:0.005);
+  if(e.key==='ArrowLeft'){ state.logoPos.x = Math.max(0, state.logoPos.x - step); drawCanvas(); }
+  if(e.key==='ArrowRight'){ state.logoPos.x = Math.min(1, state.logoPos.x + step); drawCanvas(); }
+  if(e.key==='ArrowUp'){ state.logoPos.y = Math.max(0, state.logoPos.y - step); drawCanvas(); }
+  if(e.key==='ArrowDown'){ state.logoPos.y = Math.min(1, state.logoPos.y + step); drawCanvas(); }
+}
+
+/* compute logo pixel pos on canvas */
+function logoCanvasPos(){
+  if(!state.logoImage) return null;
+  const size = canvas.width;
+  const w = size * state.logoPos.scale;
+  const h = w * (state.logoImage.height/state.logoImage.width);
+  const x = (size * state.logoPos.x) - w/2;
+  const y = (size * state.logoPos.y) - h/2;
+  return {x,y,w,h};
+}
+
+/* draw final canvas (background, qr, logo) */
+async function drawCanvas(){
+  if(!canvas) createCanvas();
+  // clear
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // background color
+  ctx.fillStyle = state.bg;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // background image if any
+  if(state.bgImage){
+    const img = state.bgImage;
+    // cover
+    const ratio = Math.max(canvas.width/img.width, canvas.height/img.height);
+    const iw = img.width*ratio, ih = img.height*ratio;
+    const ix = (canvas.width - iw)/2, iy = (canvas.height - ih)/2;
+    ctx.globalAlpha = 0.95;
+    ctx.drawImage(img, ix, iy, iw, ih);
+    ctx.globalAlpha = 1;
+  }
+
+  // draw QR (SVG rasterized)
+  if(state.lastSVG){
+    const svg = state.lastSVG;
+    const img = new Image();
+    const svgBlob = new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svgBlob);
+    await new Promise((res,rej)=>{
+      img.onload = ()=>{ ctx.drawImage(img,0,0,canvas.width,canvas.height); URL.revokeObjectURL(url); res(); };
+      img.onerror = ()=>{ URL.revokeObjectURL(url); res(); };
+      img.src = url;
+    });
+  }
+
+  // draw logo
+  if(state.logoImage){
+    const lp = logoCanvasPos();
+    if(lp){
+      // optional border/white bg for contrast
+      ctx.save();
+      // ensure contrast: draw white rounded rect behind logo
+      ctx.fillStyle = '#fff';
+      const pad = 6;
+      roundRect(ctx, lp.x-pad, lp.y-pad, lp.w+pad*2, lp.h+pad*2, 8);
+      ctx.fill();
+      ctx.drawImage(state.logoImage, lp.x, lp.y, lp.w, lp.h);
+      ctx.restore();
+    }
+  }
+}
+
+/* helper round rect */
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* ====== Generate QR content for each type ====== */
+function buildPayload(){
+  const t = state.type;
+  if(t==='url'){
+    return state.fields.url || qrTextInput.value || '';
+  }
+  if(t==='text'){
+    return state.fields.text || qrTextInput.value || '';
+  }
+  if(t==='wifi'){
+    const s = state.fields.ssid||'';
+    const p = state.fields.password||'';
+    const e = state.fields.encryption||'WPA';
+    return `WIFI:T:${e};S:${escapeSemicolon(s)};P:${escapeSemicolon(p)};;`;
+  }
+  if(t==='vcard'){
+    const fn=state.fields.fn||'';
+    const org=state.fields.org||'';
+    const tel=state.fields.tel||'';
+    const email=state.fields.email||'';
+    const url=state.fields.url||'';
+    let v = `BEGIN:VCARD\nVERSION:3.0\nFN:${fn}\n`;
+    if(org) v+=`ORG:${org}\n`;
+    if(tel) v+=`TEL:${tel}\n`;
+    if(email) v+=`EMAIL:${email}\n`;
+    if(url) v+=`URL:${url}\n`;
+    v+=`END:VCARD`;
+    return v;
+  }
+  if(t==='sms'){
+    const phone=state.fields.phone||'';
+    const msg=state.fields.message||'';
+    return `SMSTO:${phone}:${msg}`;
+  }
+  if(t==='email'){
+    const to=state.fields.to||'';
+    const sub=state.fields.subject||'';
+    const body=state.fields.body||'';
+    return `MATMSG:TO:${to};SUB:${escapeSemicolon(sub)};BODY:${escapeSemicolon(body)};;`;
+  }
+  if(t==='geo'){
+    const lat=state.fields.lat||'0';
+    const lng=state.fields.lng||'0';
+    return `geo:${lat},${lng}`;
+  }
+  if(t==='event'){
+    const title=state.fields.title||'';
+    const start=state.fields.start||'';
+    const end=state.fields.end||'';
+    const loc=state.fields.location||'';
+    const desc=state.fields.desc||'';
+    // simple VEVENT
+    return `BEGIN:VEVENT\nSUMMARY:${title}\nDTSTART:${formatICal(start)}\nDTEND:${formatICal(end)}\nLOCATION:${loc}\nDESCRIPTION:${desc}\nEND:VEVENT`;
+  }
+  if(t==='app'){
+    const ios=state.fields.ios||'';
+    const android=state.fields.android||'';
+    const fallback=state.fields.fallback||'';
+    // simple: prefer fallback or android/ios
+    return fallback || android || ios || '';
+  }
+  if(t==='pdf'){
+    // if user uploaded PDF, embed link placeholder (can't upload server-side)
+    const f = state.fields.file;
+    if(f && f.name) return `PDF:${f.name}`;
+    return 'PDF: (لم يتم اختيار ملف)';
+  }
+  return '';
+}
+
+function escapeSemicolon(s){ return (s||'').replace(/;/g,'\\;'); }
+function formatICal(s){
+  // naive: remove non digits
+  return (s||'').replace(/[^0-9]/g,'');
+}
+
+/* ====== Generate QR (SVG + draw) ====== */
+function generateQR(){
+  // update state from inputs
+  state.size = parseInt(document.getElementById('qr-size').value);
+  state.color = document.getElementById('qr-color').value;
+  state.bg = document.getElementById('qr-bg').value;
+  state.moduleStyle = document.getElementById('moduleStyle').value;
+  state.eyeStyle = document.getElementById('eyeStyle').value;
+
+  // build payload
+  const payload = buildPayload();
+  qrTextInput.value = payload;
+
+  // generate SVG using qrcode lib (basic)
+  const options = {
+    type: 'svg',
+    color: { dark: state.color, light: state.bg },
+    width: state.size
+  };
+
+  // produce SVG string
+  QRCode.toString(payload, options, function(err, svg){
+    if(err){ console.error(err); return; }
+    // optionally post-process svg to change module/eye styles (simple replacement)
+    let processed = svg;
+    // apply module style: for dot style, replace rects with circles (approx)
+    if(state.moduleStyle==='dot'){
+      processed = processed.replace(/<rect/g,'<circle').replace(/\/rect>/g,'/circle>');
+    }
+    // store
+    state.lastSVG = processed;
+    // ensure canvas size matches
+    if(!canvas || canvas.width !== state.size){
+      createCanvas();
+      canvas.width = state.size;
+      canvas.height = state.size;
+    } else {
+      canvas.width = state.size;
+      canvas.height = state.size;
+    }
+    // draw final
+    drawCanvas().then(()=>{ checkScanability(); });
+  });
+}
+
+/* ====== Upload handlers ====== */
+function handleLogoUpload(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = new Image();
+    img.onload = ()=>{ state.logoImage = img; state.logoPos.scale = 0.22; drawCanvas(); };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+function handleBgUpload(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = new Image();
+    img.onload = ()=>{ state.bgImage = img; drawCanvas(); };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+
+/* ====== Export functions ====== */
+function downloadPNG(){
+  const link = document.createElement('a');
+  link.download = 'qr.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+function downloadSVG(){
+  if(!state.lastSVG) return;
+  // if logo present, embed logo as base64 into svg (simple approach)
+  let svg = state.lastSVG;
+  // try to inline logo if exists
+  if(state.logoImage){
+    // draw logo to temp canvas and get dataURL
+    const tmp = document.createElement('canvas');
+    tmp.width = state.logoImage.width;
+    tmp.height = state.logoImage.height;
+    const tctx = tmp.getContext('2d');
+    tctx.drawImage(state.logoImage,0,0);
+    const data = tmp.toDataURL('image/png');
+    // insert image tag centered (approx)
+    const size = state.size;
+    const w = size * state.logoPos.scale;
+    const h = w * (state.logoImage.height/state.logoImage.width);
+    const x = (size*state.logoPos.x) - w/2;
+    const y = (size*state.logoPos.y) - h/2;
+    const imgTag = `<image href="${data}" x="${x}" y="${y}" width="${w}" height="${h}" />`;
+    // naive insertion before closing svg
+    svg = svg.replace('</svg>', imgTag + '</svg>');
+  }
+  const blob = new Blob([svg],{type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'qr.svg'; a.click();
+  URL.revokeObjectURL(url);
+}
+function downloadWEBP(){
+  const q = state.webpQuality || 0.9;
+  const link = document.createElement('a');
+  link.download = 'qr.webp';
+  link.href = canvas.toDataURL('image/webp', q);
+  link.click();
+}
+function downloadPDF(){
+  const imgData = canvas.toDataURL('image/png');
+  const pdf = new jspdf.jsPDF({
+    orientation:'portrait',
+    unit:'px',
+    format:[canvas.width, canvas.height]
+  });
+  pdf.addImage(imgData,'PNG',0,0,canvas.width,canvas.height);
+  pdf.save('qr.pdf');
+}
+
+/* ====== Copy functions ====== */
+async function copyImage(){
+  try{
+    const blob = await (await fetch(canvas.toDataURL('image/png'))).blob();
+    await navigator.clipboard.write([new ClipboardItem({[blob.type]:blob})]);
+    alert('تم نسخ الصورة للحافظة');
+  }catch(e){ alert('النسخ غير مدعوم في هذا المتصفح'); }
+}
+function copyHTML(){
+  const html = `<img src="${canvas.toDataURL('image/png')}" alt="QR">`;
+  navigator.clipboard.writeText(html).then(()=>alert('تم نسخ كود HTML'));
+}
+
+/* ====== Scanability check (basic contrast + quiet zone) ====== */
+function checkScanability(){
+  // simple contrast check: compare average luminance of modules vs background
+  // sample center pixel vs corner
+  const s = canvas.width;
+  const img = ctx.getImageData(0,0,s,s).data;
+  // sample center pixel
+  const cx = Math.floor(s/2), cy = Math.floor(s/2);
+  const idx = (cy*s + cx)*4;
+  const centerLum = rgbLum(img[idx],img[idx+1],img[idx+2]);
+  // sample corner (quiet zone)
+  const idx2 = (2*s + 2)*4; // near top-left
+  const cornerLum = rgbLum(img[idx2],img[idx2+1],img[idx2+2]);
+  const contrast = Math.abs(centerLum - cornerLum);
+  scanCheckEl.textContent = contrast>50 ? 'جيد — قابل للمسح' : 'تحذير — تحقق من التباين أو حجم اللوجو';
+}
+function rgbLum(r,g,b){ return 0.2126*r + 0.7152*g + 0.0722*b; }
+
+/* ====== Templates (LocalStorage) ====== */
+function saveTemplate(){
+  const name = prompt('اسم القالب للحفظ');
+  if(!name) return;
+  const tpl = JSON.stringify(state);
+  localStorage.setItem('qr_tpl_'+name, tpl);
+  alert('تم الحفظ');
+}
+function loadTemplate(){
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('qr_tpl_'));
+  if(keys.length===0){ alert('لا قوالب محفوظة'); return; }
+  const name = prompt('أدخل اسم القالب لتحميل. المتاح: ' + keys.map(k=>k.replace('qr_tpl_','')).join(', '));
+  if(!name) return;
+  const data = localStorage.getItem('qr_tpl_'+name);
+  if(!data){ alert('لم أجد القالب'); return; }
+  const s = JSON.parse(data);
+  Object.assign(state, s);
+  // update UI
+  document.getElementById('qr-size').value = state.size;
+  document.getElementById('qr-color').value = state.color;
+  document.getElementById('qr-bg').value = state.bg;
+  document.getElementById('moduleStyle').value = state.moduleStyle;
+  document.getElementById('eyeStyle').value = state.eyeStyle;
+  document.getElementById('quietZone').value = state.quietZone;
+  document.getElementById('webpQuality').value = state.webpQuality;
+  renderTypeForm();
+  generateQR();
+}
+
+/* ====== Language toggle (RTL/EN support) ====== */
+function toggleLang(){
+  state.lang = state.lang==='ar'?'en':'ar';
+  document.documentElement.dir = state.lang==='ar'?'rtl':'ltr';
+  document.getElementById('langToggle').textContent = state.lang==='ar'?'EN':'ع';
+  // small text flips could be added
+}
+
+/* ====== Utility ====== */
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+</script>
+
+</body>
+  </html> 
