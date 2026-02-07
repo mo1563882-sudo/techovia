@@ -590,5 +590,196 @@
       <div class="header-actions">
         <button id="themeBtn" class="theme-toggle" aria-pressed="false">وضع ليلي</button>
       </div>
-    </header>
-    
+    </header
+          <main class="layout" id="mainLayout">
+      <!-- الجزء الأيسر: المعاينة والتحكم -->
+      <section class="panel preview-panel" aria-labelledby="previewTitle">
+        <div class="preview-header">
+          <div id="previewTitle" style="font-weight:700; font-size:16px;">المعاينة الحية</div>
+          <div class="toolbar">
+            <select id="formatSelect" class="select" aria-label="صيغة التحميل" style="min-width:100px;">
+              <option value="png">PNG</option>
+              <option value="svg">SVG</option>
+              <option value="webp">WEBP</option>
+            </select>
+            <button id="downloadBtn" class="btn" title="تحميل النتيجة">
+              <span>📥</span> تحميل
+            </button>
+          </div>
+        </div>
+
+        <div class="preview-area" role="region" aria-live="polite">
+          <div class="preview-canvas" id="previewCanvas">
+            <img id="bgImage" alt="" />
+            <div id="qrContainer" aria-hidden="false"></div>
+            <img id="logoOverlay" alt="شعار" />
+          </div>
+        </div>
+
+        <!-- شريط المعلومات -->
+        <div id="scanResult" class="small" style="text-align:center; padding:8px; background:rgba(255,255,255,0.03); border-radius:8px;">
+          ⚡ جاهز للتصميم - أضف بياناتك لتوليد QR
+        </div>
+
+        <!-- عناصر التحكم -->
+        <div class="controls" id="controlsArea">
+          <!-- نوع البيانات -->
+          <div class="row">
+            <div style="flex:1">
+              <label for="codeType">نوع المحتوى</label>
+              <select id="codeType" class="select" aria-controls="dataFields">
+                <option value="url">🔗 رابط ويب</option>
+                <option value="text">📝 نص حر</option>
+                <option value="wifi">📶 شبكة Wi-Fi</option>
+                <option value="email">📧 بريد إلكتروني</option>
+                <option value="phone">📞 رقم هاتف</option>
+                <option value="vcard">👤 بطاقة اتصال</option>
+              </select>
+            </div>
+            <div style="width:220px">
+              <label for="sizeSlider">الحجم: <span id="sizeValue">78%</span></label>
+              <input id="sizeSlider" type="range" min="10" max="100" value="78" />
+              <div class="small">64px ← → 1500px</div>
+            </div>
+          </div>
+
+          <!-- الحقول الديناميكية -->
+          <div id="dataFields" class="col" aria-live="polite">
+            <div>
+              <label for="urlField" class="small">أدخل الرابط</label>
+              <input id="urlField" class="input" type="url" placeholder="https://example.com" value="https://techovia.com" />
+              <div id="urlError" class="error"></div>
+            </div>
+          </div>
+
+          <!-- الألوان -->
+          <div class="row">
+            <div style="flex:1">
+              <label for="fgColor">🎨 لون الكود</label>
+              <input id="fgColor" type="color" class="input" value="#020617" style="height:40px; width:100%; border-radius:8px;" />
+            </div>
+            <div style="flex:1">
+              <label for="bgColor">🎨 لون الخلفية</label>
+              <input id="bgColor" type="color" class="input" value="#ffffff" style="height:40px; width:100%; border-radius:8px;" />
+            </div>
+          </div>
+
+          <!-- شبكة السلايدرات -->
+          <div class="sliders-grid">
+            <!-- عمود الخلفية -->
+            <div class="slider-column">
+              <div class="slider-group">
+                <div class="slider-group-title">تحكم بالخلفية</div>
+                
+                <div class="slider-container">
+                  <div class="slider-header">
+                    <label for="bgScale">التكبير/التصغير</label>
+                    <span id="bgScaleValue" class="slider-value">100%</span>
+                  </div>
+                  <input id="bgScale" type="range" min="50" max="150" value="100" />
+                </div>
+
+                <div class="slider-container">
+                  <div class="slider-header">
+                    <label for="bgOpacity">شفافية الخلفية</label>
+                    <span id="bgOpacityValue" class="slider-value">100%</span>
+                  </div>
+                  <input id="bgOpacity" type="range" min="0" max="100" value="100" />
+                </div>
+
+                <!-- زر تحميل الخلفية -->
+                <label class="small" style="margin-top:12px;">📷 خلفية الصورة</label>
+                <div class="file-upload-btn" onclick="document.getElementById('bgUpload').click()">
+                  <div class="file-upload-icon">📁</div>
+                  <div class="file-upload-text">اختر صورة خلفية</div>
+                  <div class="file-upload-sub">JPG, PNG, WebP (حد أقصى 2MB)</div>
+                  <input id="bgUpload" type="file" accept="image/*" class="file-upload-input" />
+                </div>
+                <div id="bgError" class="error"></div>
+              </div>
+            </div>
+
+            <!-- عمود الـQR -->
+            <div class="slider-column">
+              <div class="slider-group">
+                <div class="slider-group-title">تحكم بالـQR</div>
+                
+                <div class="slider-container">
+                  <div class="slider-header">
+                    <label for="qrOpacity">شفافية الـQR</label>
+                    <span id="qrOpacityValue" class="slider-value">100%</span>
+                  </div>
+                  <input id="qrOpacity" type="range" min="0" max="100" value="100" />
+                </div>
+
+                <!-- زر تحميل اللوجو -->
+                <label class="small" style="margin-top:12px;">🏷️ شعار مركزي (اختياري)</label>
+                <div class="file-upload-btn" onclick="document.getElementById('logoUpload').click()">
+                  <div class="file-upload-icon">🖼️</div>
+                  <div class="file-upload-text">اختر شعار</div>
+                  <div class="file-upload-sub">PNG مع خلفية شفافة</div>
+                  <input id="logoUpload" type="file" accept="image/*" class="file-upload-input" />
+                </div>
+                <div id="logoError" class="error"></div>
+
+                <!-- سلايدر شفافية اللوجو -->
+                <div class="slider-container" style="margin-top:12px;">
+                  <div class="slider-header">
+                    <label for="logoOpacity">شفافية الشعار</label>
+                    <span id="logoOpacityValue" class="slider-value">100%</span>
+                  </div>
+                  <input id="logoOpacity" type="range" min="0" max="100" value="100" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- أزرار الفحص -->
+          <div class="row" style="justify-content:center; margin-top:10px;">
+            <button id="scanBtn" class="btn secondary">
+              <span>🔍</span> فحص القابلية للمسح
+            </button>
+            <button id="autoFixBtn" class="btn secondary">
+              <span>⚙️</span> ضبط تلقائي
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- الجزء الأيمن: أشكال QR -->
+      <aside class="panel qr-shapes-panel" aria-label="تخصيص الشكل">
+        <div class="qr-shapes-title">تخصيص الشكل</div>
+        
+        <label class="small">أشكال النقاط</label>
+        <div class="shapes-grid" id="dotShapesGrid">
+          <div class="shape-option active" data-shape="square" onclick="selectShape('dot','square')">
+            <div class="shape-icon">▢</div>
+            <div class="shape-label">مربعة</div>
+          </div>
+          <div class="shape-option" data-shape="rounded" onclick="selectShape('dot','rounded')">
+            <div class="shape-icon">▢</div>
+            <div class="shape-label">مستديرة</div>
+          </div>
+          <div class="shape-option" data-shape="dots" onclick="selectShape('dot','dots')">
+            <div class="shape-icon">●</div>
+            <div class="shape-label">نقاط</div>
+          </div>
+        </div>
+
+        <label class="small" style="margin-top:20px;">أشكال العيون</label>
+        <div class="shapes-grid" id="eyeShapesGrid">
+          <div class="shape-option active" data-shape="classic" onclick="selectShape('eye','classic')">
+            <div class="shape-icon">◼</div>
+            <div class="shape-label">كلاسيكية</div>
+          </div>
+          <div class="shape-option" data-shape="rounded" onclick="selectShape('eye','rounded')">
+            <div class="shape-icon">◯</div>
+            <div class="shape-label">مستديرة</div>
+          </div>
+          <div class="shape-option" data-shape="frame" onclick="selectShape('eye','frame')">
+            <div class="shape-icon">▣</div>
+            <div class="shape-label">بإطار</div>
+          </div>
+        </div>
+      </aside>
+              </main>
