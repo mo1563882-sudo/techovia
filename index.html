@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<meta name="description" content="Techovia Speed Test - Advanced Internet Speed Testing Tool">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Techovia">
+
+<link rel="icon" type="image/svg+xml" id="faviconLink">
+<link rel="apple-touch-icon" id="appleIcon">
+<link rel="manifest" id="manifestLink">
+<title>Techovia Speed Test v4.0</title>
+<style>
+:root {
+  --primary: #2563eb; --primary-light: #eff6ff;
+  --bg: #f8fafc; --card-bg: #ffffff;
+  --text-main: #0f172a; --text-muted: #64748b;
+  --border: #e2e8f0; --stat-bg: #f1f5f9;
+  --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+  --radius: 16px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+[data-theme="dark"] {
+  --primary: #3b82f6; --primary-light: #1e293b;
+  --bg: #0b0f19; --card-bg: #111827;
+  --text-main: #f8fafc; --text-muted: #94a3b8;
+  --border: #1f2937; --stat-bg: #1f2937;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; min-height: 100dvh;
+  background: var(--bg); color: var(--text-main);
+  font-family: var(--font);
+  transition: background-color .3s, color .3s;
+  -webkit-font-smoothing: antialiased;
+}
+button, select, input { font-family: var(--font); }
+
+.app { min-height: 100dvh; display: flex; justify-content: center; align-items: flex-start; padding: 16px; }
+.card {
+  background: var(--card-bg); width: 100%; max-width: 520px;
+  padding: 20px; border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 12px;
+  box-shadow: 0 4px 24px -6px rgba(0,0,0,.08);
+}
+
+.header { display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.header-actions { display: flex; gap: 4px; flex-wrap: nowrap; }
+select, .icon-btn {
+  background: var(--stat-bg); color: var(--text-main);
+  border: 1px solid var(--border); padding: 5px 8px;
+  border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 500;
+  white-space: nowrap; flex-shrink: 0;
+}
+select { max-width: 100px; }
+.icon-btn:hover, select:hover { background: var(--border); }
+
+.title {
+  font-size: 20px; font-weight: 700; text-align: center;
+  margin: 0; letter-spacing: -.4px; color: var(--primary);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.title svg { width: 26px; height: 26px; }
+
+.speed-display { text-align: center; }
+.speed-value {
+  font-size: clamp(42px, 14vw, 60px); font-weight: 800;
+  color: var(--primary); line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: -1.5px;
+}
+.speed-unit { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.status-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.quality-badge {
+  display: inline-block; padding: 4px 12px;
+  background: var(--primary-light); color: var(--primary);
+  border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 8px;
+}
+.progress-bar { width: 100%; height: 4px; background: var(--stat-bg); border-radius: 2px; overflow: hidden; margin-top: 10px; }
+.progress-fill { height: 100%; background: var(--primary); transition: width .3s; }
+
+.graph-container {
+  position: relative; background: var(--stat-bg);
+  border-radius: 12px; border: 1px solid var(--border); overflow: hidden;
+}
+canvas { display: block; width: 100%; height: 120px; }
+.warmup {
+  position: absolute; top: 8px; left: 8px; font-size: 10px;
+  color: var(--warning); background: var(--card-bg);
+  padding: 3px 8px; border-radius: 4px; font-weight: 600; display: none;
+}
+.warmup.active { display: block; }
+
+.mode-selector { display: flex; gap: 4px; background: var(--stat-bg); padding: 3px; border-radius: 10px; }
+.mode-selector button {
+  flex: 1; background: transparent; border: 0; padding: 6px;
+  border-radius: 8px; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; transition: all .2s;
+}
+.mode-selector button.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+
+.tabs { display: flex; gap: 4px; background: var(--stat-bg); padding: 3px; border-radius: 10px; }
+.tabs button {
+  flex: 1; background: transparent; border: 0; padding: 7px;
+  border-radius: 8px; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; transition: all .2s;
+}
+.tabs button.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+
+.metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.metric-box {
+  background: var(--stat-bg); padding: 8px 10px; border-radius: 10px;
+  text-align: center; border: 1px solid transparent;
+  min-height: 52px;
+  display: flex; flex-direction: column; justify-content: center;
+  transition: all .2s;
+}
+.metric-box.span-2 { grid-column: span 2; }
+.metric-box.highlight { border-color: var(--primary); background: var(--primary-light); }
+.metric-box.updated { animation: pulse .8s ease; }
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.04); box-shadow: 0 0 12px var(--primary); }
+}
+.metric-box .label {
+  display: block; font-size: 10px; color: var(--text-muted);
+  font-weight: 500; margin-bottom: 2px; line-height: 1.2;
+}
+.metric-box .value {
+  font-size: 14px; font-weight: 700;
+  font-variant-numeric: tabular-nums; line-height: 1.2;
+}
+
+.calc-section { background: var(--stat-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+.calc-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+.calc-row:last-child { margin-bottom: 0; }
+.calc-row span { color: var(--text-muted); }
+input[type="range"] { width: 100%; accent-color: var(--primary); margin: 4px 0; }
+
+.scores { display: flex; flex-direction: column; gap: 5px; }
+.score-row {
+  display: flex; justify-content: space-between;
+  background: var(--stat-bg); padding: 8px 12px;
+  border-radius: 10px; font-size: 12px;
+}
+.score-row span { color: var(--text-muted); }
+
+.share-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-secondary {
+  flex: 1; min-width: 100px; padding: 10px; background: var(--stat-bg);
+  border: 1px solid var(--border); color: var(--text-main);
+  border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: all .2s;
+}
+.btn-secondary:hover:not(:disabled) { background: var(--border); }
+.btn-secondary:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-main {
+  width: 100%; padding: 13px; background: var(--primary); color: #fff;
+  border: 0; border-radius: 12px; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+}
+.btn-main:hover:not(:disabled) { box-shadow: 0 4px 12px rgba(37,99,235,.3); }
+.btn-main:disabled { opacity: .6; cursor: not-allowed; }
+
+.report-preview {
+  background: var(--stat-bg); padding: 10px; border-radius: 10px;
+  font-size: 11px; direction: ltr; text-align: left;
+  overflow-x: auto; margin: 0; color: var(--text-muted);
+  white-space: pre-wrap;
+}
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 10px 18px; border-radius: 10px; font-size: 12px; font-weight: 600;
+  color: #fff; z-index: 2000; animation: slideUp .3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
+}
+.toast.ok { background: var(--success); }
+.toast.err { background: var(--danger); }
+@keyframes slideUp {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+  justify-content: center; align-items: center; padding: 20px; z-index: 1500;
+}
+.modal.active { display: flex; }
+.modal-content {
+  background: var(--card-bg); border-radius: var(--radius);
+  width: 100%; max-width: 500px; max-height: 80vh; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.modal-header h2 { font-size: 14px; margin: 0; }
+.close {
+  background: var(--stat-bg); border: 1px solid var(--border);
+  width: 28px; height: 28px; border-radius: 8px; cursor: pointer;
+  color: var(--text-main); font-size: 16px;
+}
+.modal-body { padding: 14px 16px; overflow-y: auto; }
+.modal-body pre {
+  background: var(--stat-bg); padding: 8px 10px; border-radius: 8px;
+  font-size: 11px; direction: ltr; text-align: left; overflow-x: auto;
+}
+.dev-log {
+  background: #0f172a; color: #10b981;
+  font-family: ui-monospace, monospace; font-size: 10px;
+  padding: 10px; border-radius: 8px; direction: ltr; text-align: left;
+  white-space: pre-wrap; max-height: 400px; overflow-y: auto;
+}
+.history-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 10px; border-radius: 8px; background: var(--stat-bg);
+  margin-bottom: 6px; font-size: 11px;
+}
+.history-item .meta { color: var(--text-muted); }
+.history-item .vals { font-weight: 600; direction: ltr; }
+
+@media (max-width: 400px) {
+  .card { padding: 14px; }
+  .title { font-size: 17px; }
+  .title svg { width: 22px; height: 22px; }
+  select, .icon-btn { padding: 4px 6px; font-size: 10px; }
+  select { max-width: 80px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="card">
+    <header class="header">
+      <select id="langSelect" aria-label="Language"></select>
+      <div class="header-actions">
+        <button class="icon-btn" id="btnHistory" title="History">📊</button>
+        <button class="icon-btn" id="btnApi" title="API">🔗</button>
+        <button class="icon-btn" id="btnDev" title="Dev">⚙️</button>
+        <button class="icon-btn" id="btnTheme" title="Theme">🌙</button>
+      </div>
+    </header>
+
+    <h1 class="title">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="techGrad" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#1e40af"/>
+            <stop offset="100%" stop-color="#3b82f6"/>
+          </linearGradient>
+        </defs>
+        <path d="M 20 35 A 35 35 0 1 0 80 35" fill="none" stroke="url(#techGrad)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M 50 25 Q 43 50 50 75 Q 57 50 50 25 Z" fill="url(#techGrad)"/>
+        <path d="M 36 42 Q 32 58 38 72 Q 43 58 36 42 Z" fill="url(#techGrad)"/>
+        <path d="M 64 42 Q 68 58 62 72 Q 57 58 64 42 Z" fill="url(#techGrad)"/>
+      </svg>
+      <span>Techovia Speed Test</span>
+    </h1>
+
+    <div class="mode-selector">
+      <button data-mode="quick" class="active">⚡ سريع (10s)</button>
+      <button data-mode="standard">🎯 قياسي (30s)</button>
+    </div>
+
+    <div class="speed-display">
+      <div class="speed-value" id="speed">0</div>
+      <div class="speed-unit" id="unit">MB/s</div>
+      <div class="status-text" id="status">جاهز للفحص</div>
+      <div class="quality-badge" id="quality" style="display:none">-</div>
+      <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    </div>
+
+    <div class="graph-container">
+      <canvas id="graph"></canvas>
+      <div class="warmup" id="warmup">⏱️ WARMUP</div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="active" data-tab="overview">نظرة عامة</button>
+      <button data-tab="details">تفاصيل</button>
+      <button data-tab="share">مشاركة</button>
+    </div>
+
+    <div class="tab-panel" data-panel="overview">
+      <div class="metrics-grid">
+        <div class="metric-box span-2 highlight">
+          <span class="label" data-i18n="down">التحميل</span>
+          <span class="value" id="down">-</span>
+        </div>
+        <div class="metric-box span-2">
+          <span class="label" data-i18n="up">الرفع</span>
+          <span class="value" id="up">-</span>
+        </div>
+        <div class="metric-box"><span class="label" data-i18n="ping">الاستجابة</span><span class="value" id="ping">-</span></div>
+        <div class="metric-box"><span class="label" data-i18n="jitter">التقلب</span><span class="value" id="jitter">-</span></div>
+      </div>
+
+      <div class="calc-section" style="margin-top:8px">
+        <div class="calc-row">
+          <span data-i18n="time1gb">زمن تحميل 1 جيجابايت:</span>
+          <strong id="time1gb">--:--</strong>
+        </div>
+        <div class="calc-row">
+          <span><span data-i18n="customSize">حجم مخصص:</span> <b id="sliderVal">1000</b> MB</span>
+          <strong id="customTime">--:--</strong>
+        </div>
+        <input type="range" id="sizeSlider" min="10" max="5000" step="10" value="1000">
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="details" style="display:none">
+      <div class="metrics-grid">
+        <div class="metric-box"><span class="label" data-i18n="stab">الاستقرار</span><span class="value" id="stability">-</span></div>
+        <div class="metric-box"><span class="label" data-i18n="bloat">Bufferbloat</span><span class="value" id="bufferbloat">-</span></div>
+        <div class="metric-box"><span class="label" data-i18n="noise">التشويش</span><span class="value" id="noise">-</span></div>
+        <div class="metric-box"><span class="label" data-i18n="jitterPct">تذبذب السرعة</span><span class="value" id="jitterPct">-</span></div>
+      </div>
+
+      <div class="scores" id="scoresBlock" style="display:none;margin-top:8px">
+        <div class="score-row"><span data-i18n="gaming">أداء الألعاب</span><b id="scoreGaming">-</b></div>
+        <div class="score-row"><span data-i18n="stream">بث الفيديو</span><b id="scoreStream">-</b></div>
+        <div class="score-row"><span data-i18n="videoSpeed">سرعة الفيديو</span><b id="videoSpeed">-</b></div>
+        <div class="score-row"><span data-i18n="videoRes">دقة الفيديو</span><b id="videoResolution">-</b></div>
+        <div class="score-row"><span data-i18n="calls">مكالمات الفيديو</span><b id="scoreCalls">-</b></div>
+        <div class="score-row"><span data-i18n="liveStream">بث مباشر</span><b id="scoreLive">-</b></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="share" style="display:none">
+      <div class="share-actions">
+        <button class="btn-secondary" id="btnCopy" data-i18n="copy" disabled>نسخ</button>
+        <button class="btn-secondary" id="btnImage" data-i18n="image" disabled>صورة</button>
+        <button class="btn-secondary" id="btnExport" data-i18n="export" disabled>JSON</button>
+      </div>
+      <pre class="report-preview" id="reportPreview" style="margin-top:8px;display:none"></pre>
+    </div>
+
+    <button class="btn-main" id="btnStart" data-i18n="btnStart">بدء الاختبار</button>
+  </div>
+</div>
+
+<div class="modal" id="apiModal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>🔗 Mini API v1.0</h2><button class="close" data-close="apiModal">×</button></div>
+    <div class="modal-body">
+      <p style="font-size:12px">Access results from browser console:</p>
+      <pre>window.TechoviaAPI.results</pre>
+      <p style="font-size:12px">History:</p>
+      <pre>window.TechoviaAPI.history</pre>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="devModal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>🛠️ Developer Console</h2><button class="close" data-close="devModal">×</button></div>
+    <div class="modal-body"><div class="dev-log" id="devLog">No logs yet...</div></div>
+  </div>
+</div>
+
+<div class="modal" id="historyModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📊 سجل الفحوصات</h2>
+      <div>
+        <button class="close" id="btnClearHistory" style="margin-inline-end:4px" title="Clear">🗑️</button>
+        <button class="close" data-close="historyModal">×</button>
+      </div>
+    </div>
+    <div class="modal-body" id="historyBody"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ============ CONFIG ============
+  const CONFIG = {
+    QUICK_DURATION: 10,
+    STANDARD_DURATION: 30,
+    PING_COUNT: 5,
+    DOWNLOAD_MAX_CHUNK: 500 * 1024 * 1024,
+    UPLOAD_CHUNK_SIZE: 5 * 1024 * 1024,
+    BLOAT_INTERVAL_MS: 1000,
+    PING_URL: 'https://speed.cloudflare.com/__down?bytes=0',
+    DOWNLOAD_URL: 'https://speed.cloudflare.com/__down',
+    UPLOAD_URL: 'https://speed.cloudflare.com/__up',
+  };
+
+  const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#1e40af"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs><path d="M 20 35 A 35 35 0 1 0 80 35" fill="none" stroke="url(#g)" stroke-width="7" stroke-linecap="round"/><path d="M 50 25 Q 43 50 50 75 Q 57 50 50 25 Z" fill="url(#g)"/><path d="M 36 42 Q 32 58 38 72 Q 43 58 36 42 Z" fill="url(#g)"/><path d="M 64 42 Q 68 58 62 72 Q 57 58 64 42 Z" fill="url(#g)"/></svg>`;
+
+  // ============ TRANSLATIONS ============
+  const T = {
+    ar: { time1gb:"زمن تحميل 1 جيجابايت:", customSize:"حجم مخصص:", ping:"الاستجابة", jitter:"التقلب", bloat:"Bufferbloat", stab:"الاستقرار", noise:"التشويش", jitterPct:"تذبذب السرعة", down:"التحميل", up:"الرفع", gaming:"أداء الألعاب", stream:"بث الفيديو", videoSpeed:"سرعة الفيديو", videoRes:"دقة الفيديو", calls:"مكالمات الفيديو", liveStream:"بث مباشر", btnStart:"بدء الاختبار", copy:"نسخ التقرير", export:"تصدير JSON", image:"حفظ كصورة", ready:"جاهز للفحص", conn:"جاري الاتصال...", pingTest:"قياس الاستجابة...", downing:"قياس التحميل...", uping:"قياس الرفع...", done:"اكتمل الفحص", err:"حدث خطأ", qGood:"جودة الاتصال: ممتازة", qAvg:"جودة الاتصال: متوسطة", qBad:"جودة الاتصال: ضعيفة", st4k:"ممتاز لـ 4K", stHd:"جيد جداً لـ 1080p", stSd:"متوسط لـ 720p", stBad:"ضعيف (SD)", gPro:"احترافي", gStab:"مستقر", gLag:"غير مستقر", cExcel:"ممتاز", cGood:"جيد", cBad:"ضعيف", lExcel:"ممتاز", lGood:"جيد", lBad:"ضعيف", tabOverview:"نظرة عامة", tabDetails:"تفاصيل", tabShare:"مشاركة", copyOK:"تم النسخ!", copyFail:"فشل النسخ", imageOK:"تم حفظ الصورة!", noHistory:"لا توجد فحوصات محفوظة" },
+    en: { time1gb:"1GB Time:", customSize:"Custom:", ping:"Ping", jitter:"Jitter", bloat:"Bufferbloat", stab:"Stability", noise:"Noise", jitterPct:"Jitter %", down:"Download", up:"Upload", gaming:"Gaming", stream:"Streaming", videoSpeed:"Video Speed", videoRes:"Video Resolution", calls:"Video Calls", liveStream:"Live Stream", btnStart:"Start Test", copy:"Copy Report", export:"Export JSON", image:"Save Image", ready:"Ready", conn:"Connecting...", pingTest:"Testing Ping...", downing:"Testing Download...", uping:"Testing Upload...", done:"Done", err:"Error", qGood:"Quality: Excellent", qAvg:"Quality: Average", qBad:"Quality: Poor", st4k:"4K Ready", stHd:"1080p HD", stSd:"720p SD", stBad:"Poor (SD)", gPro:"Pro", gStab:"Stable", gLag:"Unstable", cExcel:"Excellent", cGood:"Good", cBad:"Poor", lExcel:"Excellent", lGood:"Good", lBad:"Poor", tabOverview:"Overview", tabDetails:"Details", tabShare:"Share", copyOK:"Copied!", copyFail:"Copy failed", imageOK:"Image saved!", noHistory:"No history yet" },
+    fr: { time1gb:"Temps 1Go:", customSize:"Taille:", ping:"Latence", jitter:"Gigue", bloat:"Bufferbloat", stab:"Stabilité", noise:"Bruit", jitterPct:"Variation", down:"Téléchargement", up:"Envoi", gaming:"Jeu", stream:"Streaming", videoSpeed:"Vitesse vidéo", videoRes:"Résolution", calls:"Appels vidéo", liveStream:"Live", btnStart:"Démarrer", copy:"Copier", export:"Exporter", image:"Image", ready:"Prêt", conn:"Connexion...", pingTest:"Test latence...", downing:"Test téléchargement...", uping:"Test envoi...", done:"Terminé", err:"Erreur", qGood:"Excellente", qAvg:"Moyenne", qBad:"Faible", st4k:"4K", stHd:"1080p", stSd:"720p", stBad:"Faible", gPro:"Pro", gStab:"Stable", gLag:"Instable", cExcel:"Excellent", cGood:"Bon", cBad:"Médiocre", lExcel:"Excellent", lGood:"Bon", lBad:"Médiocre", tabOverview:"Aperçu", tabDetails:"Détails", tabShare:"Partager", copyOK:"Copié!", copyFail:"Échec", imageOK:"Image enregistrée!", noHistory:"Pas d'historique" },
+    de: { time1gb:"1GB Zeit:", customSize:"Größe:", ping:"Ping", jitter:"Jitter", bloat:"Bufferbloat", stab:"Stabilität", noise:"Rauschen", jitterPct:"Schwankung", down:"Download", up:"Upload", gaming:"Gaming", stream:"Streaming", videoSpeed:"Video-Tempo", videoRes:"Auflösung", calls:"Videoanrufe", liveStream:"Live", btnStart:"Test starten", copy:"Kopieren", export:"Export", image:"Bild", ready:"Bereit", conn:"Verbinde...", pingTest:"Ping-Test...", downing:"Download-Test...", uping:"Upload-Test...", done:"Fertig", err:"Fehler", qGood:"Hervorragend", qAvg:"Durchschnitt", qBad:"Schlecht", st4k:"4K", stHd:"1080p", stSd:"720p", stBad:"Schlecht", gPro:"Pro", gStab:"Stabil", gLag:"Instabil", cExcel:"Ausgezeichnet", cGood:"Gut", cBad:"Schlecht", lExcel:"Ausgezeichnet", lGood:"Gut", lBad:"Schlecht", tabOverview:"Übersicht", tabDetails:"Details", tabShare:"Teilen", copyOK:"Kopiert!", copyFail:"Fehler", imageOK:"Gespeichert!", noHistory:"Keine Historie" },
+    es: { time1gb:"Tiempo 1GB:", customSize:"Tamaño:", ping:"Ping", jitter:"Fluctuación", bloat:"Bufferbloat", stab:"Estabilidad", noise:"Ruido", jitterPct:"Variación", down:"Descarga", up:"Subida", gaming:"Juegos", stream:"Streaming", videoSpeed:"Velocidad", videoRes:"Resolución", calls:"Videollamadas", liveStream:"En vivo", btnStart:"Iniciar", copy:"Copiar", export:"Exportar", image:"Imagen", ready:"Listo", conn:"Conectando...", pingTest:"Probando ping...", downing:"Probando descarga...", uping:"Probando subida...", done:"Listo", err:"Error", qGood:"Excelente", qAvg:"Media", qBad:"Pobre", st4k:"4K", stHd:"1080p", stSd:"720p", stBad:"Pobre", gPro:"Pro", gStab:"Estable", gLag:"Inestable", cExcel:"Excelente", cGood:"Bueno", cBad:"Malo", lExcel:"Excelente", lGood:"Bueno", lBad:"Malo", tabOverview:"Resumen", tabDetails:"Detalles", tabShare:"Compartir", copyOK:"¡Copiado!", copyFail:"Error", imageOK:"¡Guardada!", noHistory:"Sin historial" },
+    tr: { time1gb:"1GB Süre:", customSize:"Boyut:", ping:"Ping", jitter:"Jitter", bloat:"Bufferbloat", stab:"Kararlılık", noise:"Gürültü", jitterPct:"Dalgalanma", down:"İndirme", up:"Yükleme", gaming:"Oyun", stream:"Yayın", videoSpeed:"Video Hızı", videoRes:"Çözünürlük", calls:"Görüntülü", liveStream:"Canlı", btnStart:"Başlat", copy:"Kopyala", export:"Dışa Aktar", image:"Resim", ready:"Hazır", conn:"Bağlanıyor...", pingTest:"Ping testi...", downing:"İndirme testi...", uping:"Yükleme testi...", done:"Tamam", err:"Hata", qGood:"Mükemmel", qAvg:"Orta", qBad:"Zayıf", st4k:"4K", stHd:"1080p", stSd:"720p", stBad:"Zayıf", gPro:"Profesyonel", gStab:"Kararlı", gLag:"Kararsız", cExcel:"Mükemmel", cGood:"İyi", cBad:"Zayıf", lExcel:"Mükemmel", lGood:"İyi", lBad:"Zayıf", tabOverview:"Genel", tabDetails:"Detaylar", tabShare:"Paylaş", copyOK:"Kopyalandı!", copyFail:"Hata", imageOK:"Kaydedildi!", noHistory:"Geçmiş yok" },
+    nl: { time1gb:"1GB Tijd:", customSize:"Grootte:", ping:"Ping", jitter:"Jitter", bloat:"Bufferbloat", stab:"Stabiliteit", noise:"Ruis", jitterPct:"Schommeling", down:"Download", up:"Upload", gaming:"Gaming", stream:"Streaming", videoSpeed:"Videosnelheid", videoRes:"Resolutie", calls:"Videobellen", liveStream:"Live", btnStart:"Start", copy:"Kopiëren", export:"Export", image:"Afbeelding", ready:"Klaar", conn:"Verbinden...", pingTest:"Ping test...", downing:"Download test...", uping:"Upload test...", done:"Voltooid", err:"Fout", qGood:"Uitstekend", qAvg:"Gemiddeld", qBad:"Slecht", st4k:"4K", stHd:"1080p", stSd:"720p", stBad:"Slecht", gPro:"Pro", gStab:"Stabiel", gLag:"Onstabiel", cExcel:"Uitstekend", cGood:"Goed", cBad:"Slecht", lExcel:"Uitstekend", lGood:"Goed", lBad:"Slecht", tabOverview:"Overzicht", tabDetails:"Details", tabShare:"Delen", copyOK:"Gekopieerd!", copyFail:"Mislukt", imageOK:"Opgeslagen!", noHistory:"Geen geschiedenis" },
+  };
+  const LANGS = [
+    { code:'ar', name:'العربية' }, { code:'en', name:'English' },
+    { code:'fr', name:'Français' }, { code:'de', name:'Deutsch' },
+    { code:'es', name:'Español' }, { code:'tr', name:'Türkçe' }, { code:'nl', name:'Nederlands' },
+  ];
+
+  // ============ STATE ============
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  const initialChunkMB = isMobile ? 25 : 100;
+
+  const state = {
+    lang: localStorage.getItem('techovia_lang') || (navigator.language.startsWith('ar') ? 'ar' : 'en'),
+    isDark: localStorage.getItem('techovia_theme') === 'dark',
+    status: 'idle',
+    mode: 'quick',
+    speeds: [],
+    progress: 0,
+    customSize: 1000,
+    results: { ping:0, jitter:0, bufferbloat:0, download:0, upload:0, stability:0, noise:0, jitterPct:0, timestamp:null },
+    scores: null,
+    devLog: [],
+    history: [],
+  };
+
+  const t = (k) => (T[state.lang] && T[state.lang][k]) || T.en[k] || k;
+
+  // ============ UTILS ============
+  function noCache(url, params = {}) {
+    const u = new URL(url);
+    Object.entries(params).forEach(([k, v]) => u.searchParams.append(k, String(v)));
+    u.searchParams.append('_t', Date.now() + Math.random());
+    return u.toString();
+  }
+  function formatTime(s) {
+    if (!isFinite(s) || s <= 0) return '--:--';
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.floor(s%60);
+    return h > 0 ? `${h}h ${m}m ${sec}s` : `${m}m ${sec}s`;
+  }
+  function $(id) { return document.getElementById(id); }
+  function log(entry) {
+    const time = new Date().toLocaleTimeString();
+    state.devLog.unshift(`[${time}] ${JSON.stringify(entry, null, 2)}`);
+    state.devLog = state.devLog.slice(0, 50);
+    $('devLog').textContent = state.devLog.join('\n\n') || 'No logs yet...';
+  }
+  function highlight(id) {
+    const el = $(id); if (!el) return;
+    const box = el.closest('.metric-box') || el;
+    box.classList.remove('updated');
+    void box.offsetWidth;
+    box.classList.add('updated');
+    setTimeout(() => box.classList.remove('updated'), 900);
+  }
+  function showToast(msg, type = 'ok') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+  }
+
+  // ============ UI ============
+  function setStatus(text) { $('status').textContent = text; }
+  function setSpeed(mbs) {
+    if (mbs >= 1) { $('speed').textContent = mbs.toFixed(2); $('unit').textContent = 'MB/s'; }
+    else { $('speed').textContent = (mbs * 1024).toFixed(0); $('unit').textContent = 'KB/s'; }
+  }
+  function setProgress(p) { $('progress').style.width = p + '%'; }
+  function setWarmup(on) { $('warmup').classList.toggle('active', on); }
+  function updateCalculators(mbs) {
+    if (mbs <= 0) return;
+    $('time1gb').textContent = formatTime(1024 / mbs);
+    $('customTime').textContent = formatTime(state.customSize / mbs);
+  }
+
+  function drawGraph() {
+    const c = $('graph'); const ctx = c.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const H = 120;
+    c.width = c.clientWidth * dpr;
+    c.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = c.clientWidth;
+    ctx.clearRect(0, 0, W, H);
+
+    const grid = state.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
+    ctx.strokeStyle = grid; ctx.lineWidth = 1;
+    for (let y = 30; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+    if (state.speeds.length < 2) return;
+    const max = Math.max(...state.speeds) * 1.2 || 1;
+    const pts = state.speeds.map((s, i) => ({
+      x: (i * W) / (state.speeds.length - 1),
+      y: H - Math.min((s / max) * (H - 20), H - 10),
+    }));
+
+    const stroke = state.isDark ? '#60a5fa' : '#3b82f6';
+    const fillTop = state.isDark ? 'rgba(96,165,250,0.25)' : 'rgba(59,130,246,0.15)';
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, fillTop); grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, H); ctx.lineTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i-1], cu = pts[i], cpx = (p.x + cu.x) / 2;
+      ctx.bezierCurveTo(cpx, p.y, cpx, cu.y, cu.x, cu.y);
+    }
+    ctx.lineTo(pts[pts.length-1].x, H); ctx.closePath();
+    ctx.fillStyle = grad; ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i-1], cu = pts[i], cpx = (p.x + cu.x) / 2;
+      ctx.bezierCurveTo(cpx, p.y, cpx, cu.y, cu.x, cu.y);
+    }
+    ctx.strokeStyle = stroke; ctx.lineWidth = 2.5; ctx.stroke();
+  }
+
+  // ============ SCORES ============
+  function calcScores(dMbs, uMbs, ping, jitter, bloat) {
+    const mbps = dMbs * 8, uMbps = uMbs * 8;
+    const quality = dMbs > 10 ? t('qGood') : dMbs > 3 ? t('qAvg') : t('qBad');
+    const stream = dMbs > 25 ? t('st4k') : dMbs > 10 ? t('stHd') : dMbs > 3 ? t('stSd') : t('stBad');
+    const totalLat = ping + jitter + bloat;
+    const gaming = totalLat < 50 ? t('gPro') : totalLat < 100 ? t('gStab') : t('gLag');
+    const calls = dMbs > 5 && uMbs > 2 && ping < 100 ? t('cExcel') : dMbs > 2 ? t('cGood') : t('cBad');
+    const live = uMbps > 10 ? t('lExcel') : uMbps > 5 ? t('lGood') : t('lBad');
+
+    let res;
+    if (mbps >= 25) res = '2160p (4K), 1080p, 720p';
+    else if (mbps >= 5) res = '1080p, 720p, 480p';
+    else if (mbps >= 2.5) res = '720p, 480p, 360p';
+    else if (mbps >= 1) res = '480p, 360p, 240p';
+    else res = '240p, 144p';
+
+    return { quality, stream, gaming, calls, live, videoSpeed: mbps.toFixed(1) + ' Mbps', videoResolution: res };
+  }
+
+  // ============ ENGINE ============
+  async function runPingTest(onProgress) {
+    const arr = [];
+    try { await fetch(noCache(CONFIG.PING_URL), { cache: 'no-store' }); } catch(e) {}
+    for (let i = 0; i < CONFIG.PING_COUNT; i++) {
+      const s = performance.now();
+      try { await fetch(noCache(CONFIG.PING_URL), { cache: 'no-store' }); arr.push(performance.now() - s); } catch(e) {}
+      if (onProgress) onProgress({ step: i+1, total: CONFIG.PING_COUNT });
+    }
+    const avg = arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+    const varc = arr.length ? arr.map(x=>(x-avg)**2).reduce((a,b)=>a+b,0)/arr.length : 0;
+    return { ping: Math.round(avg), jitter: Math.round(Math.sqrt(varc)) };
+  }
+
+  async function runDownloadTest(seconds, basePing, onProgress) {
+    const start = performance.now();
+    const ctrl = new AbortController();
+    const bloatCtrl = new AbortController();
+    const samples = [];
+    let bytes = 0, aborted = false;
+    let chunkMB = initialChunkMB;
+    const bloatPings = [];
+    let bloatLock = false;
+
+    const bloatInt = setInterval(async () => {
+      if (bloatLock || aborted) return;
+      bloatLock = true;
+      const ts = performance.now();
+      try {
+        await fetch(noCache(CONFIG.PING_URL), { cache:'no-store', signal: bloatCtrl.signal });
+        bloatPings.push(performance.now() - ts);
+      } catch(e) {}
+      bloatLock = false;
+    }, CONFIG.BLOAT_INTERVAL_MS);
+
+    const timeout = setTimeout(() => {
+      aborted = true; ctrl.abort(); bloatCtrl.abort(); clearInterval(bloatInt);
+    }, seconds * 1000);
+
+    const downloadPromise = (async () => {
+      while (!aborted) {
+        try {
+          const sizeBytes = Math.min(chunkMB * 1024 * 1024, CONFIG.DOWNLOAD_MAX_CHUNK);
+          const r = await fetch(noCache(CONFIG.DOWNLOAD_URL, { bytes: sizeBytes }), {
+            cache: 'no-store', signal: ctrl.signal
+          });
+          const reader = r.body.getReader();
+          while (!aborted) {
+            const { done, value } = await reader.read();
+            if (done || aborted) break;
+            bytes += value.length;
+          }
+          // Smart chunk: grow based on current speed
+          const elapsed = (performance.now() - start) / 1000;
+          const speed = elapsed > 0 ? bytes / (1024 * 1024 * elapsed) : 0;
+          if (speed > 50) chunkMB = Math.min(500, chunkMB * 3);
+          else if (speed > 20) chunkMB = Math.min(500, chunkMB * 2);
+          else if (speed > 5) chunkMB = Math.min(500, chunkMB * 1.5);
+        } catch(e) { break; }
+      }
+    })();
+
+    const uiLoop = setInterval(() => {
+      const elapsed = (performance.now() - start) / 1000;
+      const speed = elapsed > 0 ? bytes / (1024 * 1024 * elapsed) : 0;
+      samples.push(speed);
+      if (samples.length > 60) samples.shift();
+      onProgress({
+        speedMB: speed, elapsed,
+        progress: Math.min((elapsed / seconds) * 100, 100),
+        timeLeft: Math.max(0, Math.ceil(seconds - elapsed)),
+      });
+      if (aborted) clearInterval(uiLoop);
+    }, 200);
+
+    await downloadPromise;
+    clearInterval(uiLoop); clearInterval(bloatInt); clearTimeout(timeout);
+
+    if (bytes === 0) throw new Error('Download failed');
+    const total = (performance.now() - start) / 1000;
+    const finalSpeed = bytes / (1024 * 1024 * total);
+
+    const avg = samples.reduce((a,b)=>a+b,0) / samples.length;
+    const stdev = Math.sqrt(samples.map(x=>(x-avg)**2).reduce((a,b)=>a+b,0) / samples.length);
+    const stability = Math.max(0, 100 - (stdev / (avg || 1)) * 100);
+    const noise = (stdev / (avg || 1)) * 10;
+    const jitterPct = (stdev / (avg || 1)) * 100;
+
+    const avgBloat = bloatPings.length ? bloatPings.reduce((a,b)=>a+b,0)/bloatPings.length : basePing;
+    const bloat = Math.max(0, Math.round(avgBloat - basePing));
+
+    return {
+      speed: finalSpeed,
+      stability: Number(stability.toFixed(0)),
+      bloat, noise: Number(noise.toFixed(1)),
+      jitterPct: Number(jitterPct.toFixed(1)),
+    };
+  }
+
+  async function runUploadTest(seconds, onProgress) {
+    const start = performance.now();
+    const ctrl = new AbortController();
+    let bytes = 0, aborted = false;
+
+    // Pre-allocate payload
+    const payload = new Uint8Array(CONFIG.UPLOAD_CHUNK_SIZE);
+    for (let i = 0; i < payload.length; i += 4096) payload[i] = (Math.random() * 255) | 0;
+
+    const timeout = setTimeout(() => {
+      aborted = true; ctrl.abort();
+    }, seconds * 1000);
+
+    const uploadPromise = (async () => {
+      while (!aborted) {
+        try {
+          await fetch(CONFIG.UPLOAD_URL, {
+            method: 'POST',
+            body: payload,
+            cache: 'no-store',
+            signal: ctrl.signal,
+          });
+          bytes += payload.length;
+        } catch(e) { break; }
+      }
+    })();
+
+    const uiLoop = setInterval(() => {
+      const elapsed = (performance.now() - start) / 1000;
+      const speed = elapsed > 0 ? bytes / (1024 * 1024 * elapsed) : 0;
+      onProgress({
+        speedMB: speed, elapsed,
+        progress: Math.min((elapsed / seconds) * 100, 100),
+        timeLeft: Math.max(0, Math.ceil(seconds - elapsed)),
+      });
+      if (aborted) clearInterval(uiLoop);
+    }, 200);
+
+    await uploadPromise;
+    clearInterval(uiLoop); clearTimeout(timeout);
+
+    if (bytes === 0) throw new Error('Upload failed');
+    const total = (performance.now() - start) / 1000;
+    return { speed: bytes / (1024 * 1024 * total) };
+  }
+
+  // ============ HISTORY ============
+  function loadHistory() {
+    try { state.history = JSON.parse(localStorage.getItem('techovia_history') || '[]'); }
+    catch(e) { state.history = []; }
+  }
+  function saveHistory() {
+    localStorage.setItem('techovia_history', JSON.stringify(state.history.slice(0, 10)));
+  }
+  function addToHistory(res) {
+    state.history.unshift({
+      ...res,
+      date: new Date().toISOString(),
+    });
+    state.history = state.history.slice(0, 10);
+    saveHistory();
+  }
+  function renderHistory() {
+    const body = $('historyBody');
+    if (!state.history.length) {
+      body.innerHTML = `<p style="text-align:center;color:var(--text-muted);font-size:12px">${t('noHistory')}</p>`;
+      return;
+    }
+    body.innerHTML = state.history.map(h => {
+      const date = new Date(h.date);
+      const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      return `<div class="history-item">
+        <div>
+          <div class="meta">${dateStr}</div>
+          <div class="vals">↓${h.download} ↑${h.upload} MB/s</div>
+        </div>
+        <div style="text-align:end">
+          <div class="vals">Ping ${h.ping}ms</div>
+          <div class="meta">${h.mode || ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ============ MAIN ============
+  async function startTest() {
+    if (state.status === 'ping' || state.status === 'download' || state.status === 'upload') return;
+
+    const duration = state.mode === 'quick' ? CONFIG.QUICK_DURATION : CONFIG.STANDARD_DURATION;
+    const upDuration = Math.max(5, Math.round(duration / 2));
+
+    state.status = 'ping';
+    state.speeds = [];
+    state.results = { ping:0, jitter:0, bufferbloat:0, download:0, upload:0, stability:0, noise:0, jitterPct:0, timestamp:null };
+    state.scores = null;
+    $('btnStart').disabled = true;
+    $('quality').style.display = 'none';
+    setSpeed(0); setProgress(0);
+    setStatus(t('conn'));
+    ['down','up','ping','jitter','stability','bufferbloat','noise','jitterPct'].forEach(id => $(id).textContent = '-');
+    $('scoresBlock').style.display = 'none';
+    $('reportPreview').style.display = 'none';
+    $('btnCopy').disabled = true; $('btnImage').disabled = true; $('btnExport').disabled = true;
+    log({ event: 'test-start', mode: state.mode });
+
+    try {
+      // === PING ===
+      setStatus(t('pingTest'));
+      const pj = await runPingTest();
+      $('ping').textContent = pj.ping + ' ms';
+      $('jitter').textContent = pj.jitter + ' ms';
+      highlight('ping'); highlight('jitter');
+      log({ ping: pj.ping, jitter: pj.jitter });
+
+      // === DOWNLOAD ===
+      state.status = 'download';
+      setStatus(t('downing'));
+      setWarmup(true);
+      const down = await runDownloadTest(duration, pj.ping, (p) => {
+        setSpeed(p.speedMB);
+        updateCalculators(p.speedMB);
+        setProgress(p.progress);
+        setStatus(`${t('downing')} · ${p.timeLeft}s`);
+        state.speeds.push(p.speedMB);
+        if (state.speeds.length > 60) state.speeds.shift();
+        drawGraph();
+        if (p.elapsed > 2) setWarmup(false);
+      });
+      setWarmup(false);
+
+      $('down').textContent = down.speed.toFixed(2) + ' MB/s';
+      $('stability').textContent = down.stability + '%';
+      $('bufferbloat').textContent = '+' + down.bloat + ' ms';
+      $('noise').textContent = down.noise;
+      $('jitterPct').textContent = down.jitterPct + '%';
+      ['down','stability','bufferbloat','noise','jitterPct'].forEach(highlight);
+
+      // === UPLOAD ===
+      state.status = 'upload';
+      setStatus(t('uping'));
+      state.speeds = [];
+      drawGraph();
+      const up = await runUploadTest(upDuration, (p) => {
+        setSpeed(p.speedMB);
+        setProgress(p.progress);
+        setStatus(`${t('uping')} · ${p.timeLeft}s`);
+        state.speeds.push(p.speedMB);
+        if (state.speeds.length > 60) state.speeds.shift();
+        drawGraph();
+      });
+      $('up').textContent = up.speed.toFixed(2) + ' MB/s';
+      highlight('up');
+
+      // === FINALIZE ===
+      state.results = {
+        ping: pj.ping, jitter: pj.jitter, bufferbloat: down.bloat,
+        download: Number(down.speed.toFixed(2)),
+        upload: Number(up.speed.toFixed(2)),
+        stability: down.stability, noise: down.noise,
+        jitterPct: down.jitterPct, timestamp: new Date().toISOString(),
+        mode: state.mode,
+      };
+
+      setSpeed(down.speed);
+      updateCalculators(down.speed);
+      state.scores = calcScores(down.speed, up.speed, pj.ping, pj.jitter, down.bloat);
+
+      $('quality').textContent = state.scores.quality;
+      $('quality').style.display = 'inline-block';
+      $('scoreGaming').textContent = state.scores.gaming;
+      $('scoreStream').textContent = state.scores.stream;
+      $('videoSpeed').textContent = state.scores.videoSpeed;
+      $('videoResolution').textContent = state.scores.videoResolution;
+      $('scoreCalls').textContent = state.scores.calls;
+      $('scoreLive').textContent = state.scores.live;
+      $('scoresBlock').style.display = 'flex';
+
+      $('reportPreview').textContent = buildReport();
+      $('reportPreview').style.display = 'block';
+      $('btnCopy').disabled = false; $('btnImage').disabled = false; $('btnExport').disabled = false;
+
+      setStatus(t('done'));
+      setProgress(100);
+      state.status = 'done';
+
+      addToHistory(state.results);
+      log({ event: 'test-complete', results: state.results });
+      setTimeout(() => setProgress(0), 1500);
+    } catch (e) {
+      state.status = 'error';
+      setStatus(t('err'));
+      log({ error: e.message });
+    }
+    $('btnStart').disabled = false;
+  }
+
+  function buildReport() {
+    const r = state.results;
+    return [
+      'Techovia Speed Test v4.0',
+      `Download: ${r.download} MB/s (${(r.download * 8).toFixed(1)} Mbps)`,
+      `Upload:   ${r.upload} MB/s (${(r.upload * 8).toFixed(1)} Mbps)`,
+      `Ping: ${r.ping} ms`,
+      `Jitter: ${r.jitter} ms`,
+      `Bufferbloat: +${r.bufferbloat} ms`,
+      `Stability: ${r.stability}%`,
+      `Noise: ${r.noise}`,
+      `Jitter %: ${r.jitterPct}%`,
+      `Mode: ${r.mode}`,
+      `Timestamp: ${r.timestamp}`,
+    ].join('\n');
+  }
+
+  async function copyReport() {
+    try {
+      await navigator.clipboard.writeText(buildReport());
+      showToast(t('copyOK'), 'ok');
+    } catch (e) { showToast(t('copyFail'), 'err'); }
+  }
+
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(state.results, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `techovia_${Date.now()}.json`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+  async function shareImage() {
+    const r = state.results;
+    const W = 720, H = 1000;
+    const c = document.createElement('canvas');
+    const dpr = 2;
+    c.width = W * dpr; c.height = H * dpr;
+    const ctx = c.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // Background
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#f0f7ff'); grad.addColorStop(1, '#e0edff');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+
+    // Card
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, 40, 40, W - 80, H - 80, 24); ctx.fill();
+    ctx.shadowColor = 'rgba(37,99,235,0.1)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10;
+    roundRect(ctx, 40, 40, W - 80, H - 80, 24); ctx.fill();
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+    // Logo (drawn as a stylized icon)
+    ctx.save();
+    ctx.translate(W/2 - 30, 90);
+    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(30, 30, 24, Math.PI * 0.15, Math.PI * 1.85); ctx.stroke();
+    ctx.fillStyle = '#2563eb';
+    ctx.beginPath(); ctx.moveTo(30, 18); ctx.quadraticCurveTo(23, 35, 30, 52); ctx.quadraticCurveTo(37, 35, 30, 18); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(19, 28); ctx.quadraticCurveTo(15, 40, 21, 48); ctx.quadraticCurveTo(25, 40, 19, 28); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(41, 28); ctx.quadraticCurveTo(45, 40, 39, 48); ctx.quadraticCurveTo(35, 40, 41, 28); ctx.fill();
+    ctx.restore();
+
+    // Title
+    ctx.fillStyle = '#2563eb';
+    ctx.font = 'bold 30px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Techovia Speed Test', W/2, 175);
+
+    // Big Download
+    ctx.fillStyle = '#2563eb';
+    ctx.font = 'bold 96px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(r.download.toFixed(2), W/2, 300);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '600 22px system-ui, sans-serif';
+    ctx.fillText('MB/s Download', W/2, 335);
+
+    // Metrics grid
+    const metrics = [
+      ['Upload', r.upload.toFixed(2) + ' MB/s'],
+      ['Ping', r.ping + ' ms'],
+      ['Jitter', r.jitter + ' ms'],
+      ['Bufferbloat', '+' + r.bufferbloat + ' ms'],
+      ['Stability', r.stability + '%'],
+      ['Jitter %', r.jitterPct + '%'],
+    ];
+    const boxW = (W - 80 - 60) / 2;
+    const boxH = 90;
+    const startY = 400;
+    const gap = 20;
+    metrics.forEach((m, i) => {
+      const col = i % 2, row = Math.floor(i / 2);
+      const x = 70 + col * (boxW + gap);
+      const y = startY + row * (boxH + gap);
+      ctx.fillStyle = '#f1f5f9';
+      roundRect(ctx, x, y, boxW, boxH, 14); ctx.fill();
+      ctx.fillStyle = '#64748b';
+      ctx.font = '600 14px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m[0], x + boxW/2, y + 32);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 22px system-ui, sans-serif';
+      ctx.fillText(m[1], x + boxW/2, y + 65);
+    });
+
+    // Date
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(new Date().toLocaleString(), W/2, H - 70);
+
+    // Convert & download
+    c.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], `techovia_${Date.now()}.png`, { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: 'Techovia Speed Test' });
+          return;
+        } catch(e) {}
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = file.name;
+      a.click(); URL.revokeObjectURL(url);
+      showToast(t('imageOK'), 'ok');
+    }, 'image/png');
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // ============ PWA ============
+  function setupPWA() {
+    const iconDataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(LOGO_SVG)}`;
+    $('faviconLink').setAttribute('href', iconDataUrl);
+    $('appleIcon').setAttribute('href', iconDataUrl);
+
+    const manifestObj = {
+      name: 'Techovia Speed Test',
+      short_name: 'Techovia',
+      description: 'Advanced Internet Speed Testing Tool',
+      start_url: './',
+      scope: './',
+      display: 'standalone',
+      orientation: 'portrait',
+      background_color: '#f8fafc',
+      theme_color: '#2563eb',
+      icons: [
+        { src: iconDataUrl, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+        { src: iconDataUrl, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' },
+      ],
+    };
+    const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+    $('manifestLink').setAttribute('href', URL.createObjectURL(blob));
+  }
+
+  // ============ UI BINDINGS ============
+  function applyLang() {
+    document.documentElement.lang = state.lang;
+    document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+    localStorage.setItem('techovia_lang', state.lang);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelector('[data-tab="overview"]').textContent = t('tabOverview');
+    document.querySelector('[data-tab="details"]').textContent = t('tabDetails');
+    document.querySelector('[data-tab="share"]').textContent = t('tabShare');
+    document.querySelector('[data-mode="quick"]').textContent = '⚡ ' + (state.lang === 'ar' ? 'سريع (10s)' : state.lang === 'en' ? 'Quick (10s)' : 'Quick (10s)');
+    document.querySelector('[data-mode="standard"]').textContent = '🎯 ' + (state.lang === 'ar' ? 'قياسي (30s)' : 'Standard (30s)');
+    if (state.status === 'idle') setStatus(t('ready'));
+    else if (state.status === 'done') setStatus(t('done'));
+    else if (state.status === 'error') setStatus(t('err'));
+  }
+
+  function applyTheme() {
+    document.documentElement.setAttribute('data-theme', state.isDark ? 'dark' : 'light');
+    localStorage.setItem('techovia_theme', state.isDark ? 'dark' : 'light');
+    $('btnTheme').textContent = state.isDark ? '☀️' : '🌙';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', state.isDark ? '#0b0f19' : '#2563eb');
+    drawGraph();
+  }
+
+  function initTabs() {
+    document.querySelectorAll('.tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('.tab-panel').forEach(p => {
+          p.style.display = p.dataset.panel === tab ? 'block' : 'none';
+        });
+      });
+    });
+  }
+
+  function initModes() {
+    document.querySelectorAll('.mode-selector button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (state.status !== 'idle' && state.status !== 'done' && state.status !== 'error') return;
+        document.querySelectorAll('.mode-selector button').forEach(b => b.classList.toggle('active', b === btn));
+        state.mode = btn.dataset.mode;
+      });
+    });
+  }
+
+  function init() {
+    loadHistory();
+    const sel = $('langSelect');
+    LANGS.forEach(l => {
+      const o = document.createElement('option');
+      o.value = l.code; o.textContent = l.name;
+      sel.appendChild(o);
+    });
+    sel.value = state.lang;
+    sel.addEventListener('change', (e) => { state.lang = e.target.value; applyLang(); });
+
+    $('btnTheme').addEventListener('click', () => { state.isDark = !state.isDark; applyTheme(); });
+    $('btnStart').addEventListener('click', startTest);
+    $('btnCopy').addEventListener('click', copyReport);
+    $('btnImage').addEventListener('click', shareImage);
+    $('btnExport').addEventListener('click', exportJSON);
+    $('btnApi').addEventListener('click', () => $('apiModal').classList.add('active'));
+    $('btnDev').addEventListener('click', () => $('devModal').classList.add('active'));
+    $('btnHistory').addEventListener('click', () => { renderHistory(); $('historyModal').classList.add('active'); });
+    $('btnClearHistory').addEventListener('click', () => {
+      state.history = []; saveHistory(); renderHistory();
+    });
+    document.querySelectorAll('[data-close]').forEach(b => {
+      b.addEventListener('click', () => $(b.dataset.close).classList.remove('active'));
+    });
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('active'); });
+    });
+
+    const slider = $('sizeSlider');
+    slider.addEventListener('input', () => {
+      state.customSize = Number(slider.value);
+      $('sliderVal').textContent = slider.value;
+      if (state.results.download > 0) updateCalculators(state.results.download);
+    });
+
+    window.addEventListener('resize', drawGraph);
+
+    window.TechoviaAPI = {
+      get results() { return state.results; },
+      get history() { return state.history; },
+      version: '4.0.0',
+    };
+
+    initTabs();
+    initModes();
+    applyTheme();
+    applyLang();
+    setupPWA();
+    drawGraph();
+
+    console.log('%c🚀 Techovia Speed Test v4.0', 'color:#2563eb;font-size:16px;font-weight:bold');
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>
