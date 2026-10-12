@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" role="img" aria-label="Techovia">
+  <defs>
+    <!-- ===== Background ===== -->
+    <radialGradient id="tvBg" cx="50%" cy="42%" r="72%">
+      <stop offset="0%"   stop-color="#0d2350"/>
+      <stop offset="55%"  stop-color="#081a3d"/>
+      <stop offset="100%" stop-color="#04102a"/>
+    </radialGradient>
+
+    <!-- ===== Outer ring gradient (light top, dark bottom, refl bottom) ===== -->
+    <linearGradient id="tvRing" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#eaf6ff"/>
+      <stop offset="10%"  stop-color="#a8d9ff"/>
+      <stop offset="28%"  stop-color="#5cb0ff"/>
+      <stop offset="48%"  stop-color="#2d6fc4"/>
+      <stop offset="68%"  stop-color="#3a8ce6"/>
+      <stop offset="88%"  stop-color="#8dcbff"/>
+      <stop offset="100%" stop-color="#c9e7ff"/>
+    </linearGradient>
+
+    <!-- ===== Blade gradient (vertical) ===== -->
+    <linearGradient id="tvBlade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#eaf6ff"/>
+      <stop offset="22%"  stop-color="#b6e1ff"/>
+      <stop offset="50%"  stop-color="#5cb0ff"/>
+      <stop offset="78%"  stop-color="#2d6fc4"/>
+      <stop offset="100%" stop-color="#1c4fa8"/>
+    </linearGradient>
+
+    <!-- ===== Blade side bevel (for central blade) ===== -->
+    <linearGradient id="tvBladeBevel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#0d3a7a"/>
+      <stop offset="18%"  stop-color="#2d6fc4"/>
+      <stop offset="42%"  stop-color="#7dc8ff"/>
+      <stop offset="50%"  stop-color="#eaf6ff"/>
+      <stop offset="58%"  stop-color="#7dc8ff"/>
+      <stop offset="82%"  stop-color="#2d6fc4"/>
+      <stop offset="100%" stop-color="#0d3a7a"/>
+    </linearGradient>
+
+    <!-- ===== Crossbar gradient ===== -->
+    <linearGradient id="tvBar" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#d9efff"/>
+      <stop offset="30%"  stop-color="#7dc8ff"/>
+      <stop offset="65%"  stop-color="#3a8ce6"/>
+      <stop offset="100%" stop-color="#1c4fa8"/>
+    </linearGradient>
+
+    <!-- ===== Soft glow ===== -->
+    <filter id="tvGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- ===== Outer faint aura ===== -->
+    <filter id="tvAura" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ============ Background disc ============ -->
+  <circle cx="500" cy="500" r="500" fill="url(#tvBg)"/>
+  <!-- subtle top inner vignette -->
+  <ellipse cx="500" cy="180" rx="380" ry="120" fill="#1e3d6e" opacity="0.18"/>
+
+  <!-- ============ Outer ring ============ -->
+  <circle cx="500" cy="500" r="418" fill="none"
+          stroke="url(#tvRing)" stroke-width="40"/>
+  <!-- inner bright bevel of outer ring -->
+  <circle cx="500" cy="500" r="397" fill="none"
+          stroke="#eaf6ff" stroke-width="1.4" opacity="0.35"/>
+  <!-- outer dark bevel of outer ring -->
+  <circle cx="500" cy="500" r="440" fill="none"
+          stroke="#0a2044" stroke-width="1.6" opacity="0.55"/>
+
+  <!-- ============ Inner ring ============ -->
+  <circle cx="500" cy="500" r="325" fill="none"
+          stroke="url(#tvRing)" stroke-width="30"/>
+  <!-- inner bright bevel of inner ring -->
+  <circle cx="500" cy="500" r="310" fill="none"
+          stroke="#eaf6ff" stroke-width="1.2" opacity="0.30"/>
+  <!-- outer dark bevel of inner ring -->
+  <circle cx="500" cy="500" r="341" fill="none"
+          stroke="#0a2044" stroke-width="1.4" opacity="0.50"/>
+
+  <!-- ============ Central vertical blade ============ -->
+  <g filter="url(#tvAura)">
+    <path d="M 500 42
+             Q 522 260 522 480
+             Q 522 690 500 898
+             Q 478 690 478 480
+             Q 478 260 500 42 Z"
+          fill="url(#tvBladeBevel)"/>
+    <!-- central highlight spine -->
+    <path d="M 500 90
+             Q 507 300 507 500
+             Q 507 700 500 850
+             Q 493 700 493 500
+             Q 493 300 500 90 Z"
+          fill="#eaf6ff" opacity="0.55"/>
+  </g>
+
+  <!-- ============ Left crescent blade ============ -->
+  <g filter="url(#tvGlow)">
+    <path d="M 342 242
+             C 222 336, 165 478, 168 582
+             C 172 692, 224 772, 288 790
+             C 258 742, 240 662, 240 580
+             C 240 478, 268 358, 342 242 Z"
+          fill="url(#tvBlade)"/>
+    <!-- outer edge highlight -->
+    <path d="M 342 242
+             C 222 336, 165 478, 168 582
+             C 172 692, 224 772, 288 790"
+          fill="none" stroke="#eaf6ff" stroke-width="1.6" opacity="0.30"/>
+  </g>
+
+  <!-- ============ Right crescent blade (mirrored) ============ -->
+  <g filter="url(#tvGlow)">
+    <path d="M 658 242
+             C 778 336, 835 478, 832 582
+             C 828 692, 776 772, 712 790
+             C 742 742, 760 662, 760 580
+             C 760 478, 732 358, 658 242 Z"
+          fill="url(#tvBlade)"/>
+    <!-- outer edge highlight -->
+    <path d="M 658 242
+             C 778 336, 835 478, 832 582
+             C 828 692, 776 772, 712 790"
+          fill="none" stroke="#eaf6ff" stroke-width="1.6" opacity="0.30"/>
+  </g>
+
+  <!-- ============ Crossbars (top horizontal accents) ============ -->
+  <!-- Left crossbar -->
+  <g filter="url(#tvGlow)">
+    <rect x="318" y="300" width="130" height="30" rx="5" fill="url(#tvBar)"/>
+    <rect x="322" y="304" width="122" height="4" rx="2" fill="#eaf6ff" opacity="0.45"/>
+  </g>
+
+  <!-- Right crossbar -->
+  <g filter="url(#tvGlow)">
+    <rect x="552" y="300" width="130" height="30" rx="5" fill="url(#tvBar)"/>
+    <rect x="556" y="304" width="122" height="4" rx="2" fill="#eaf6ff" opacity="0.45"/>
+  </g>
+</svg>
