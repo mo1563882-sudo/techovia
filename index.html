@@ -1,0 +1,3618 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
+<meta name="theme-color" content="#05080f">
+<meta name="description" content="Techovia Speed Test — Advanced Internet Speed Testing Tool">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Techovia">
+
+<link rel="icon" type="image/svg+xml" href="./assets/logo.svg">
+<link rel="apple-touch-icon" href="./assets/logo.svg">
+<link rel="manifest" id="manifestLink">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<title>Techovia Speed Test</title>
+
+<style>
+/* ==================================================================
+   TOKENS
+   ================================================================== */
+:root {
+    --blue-1: #b6e1ff;
+    --blue-2: #7dc8ff;
+    --blue-3: #4dabff;
+    --blue-4: #1e5fc4;
+
+    --bg: #f5f8fc;
+    --surface-1: #ffffff;
+    --surface-2: #eef3fb;
+    --surface-3: #e0e8f5;
+    --border: rgba(10,26,58,0.08);
+    --border-strong: rgba(10,26,58,0.14);
+
+    --text-1: #0a1a3a;
+    --text-2: #4a5e7c;
+    --text-3: #8899b0;
+
+    --primary: #1e6fe0;
+    --primary-glow: rgba(30,111,224,0.35);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --violet: #8b5cf6;
+
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-full: 999px;
+
+    --shadow-sm: 0 1px 2px rgba(10,26,58,0.05);
+    --shadow-md: 0 4px 14px -6px rgba(10,26,58,0.12);
+
+    --font-body: 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
+    --font-display: 'Space Grotesk', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+
+    --t-fast: 0.14s cubic-bezier(0.4,0,0.2,1);
+    --t-base: 0.24s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="dark"] {
+    --bg: #05080f;
+    --surface-1: #0c1a30;
+    --surface-2: #132642;
+    --surface-3: #1d3556;
+    --border: rgba(77,171,255,0.10);
+    --border-strong: rgba(77,171,255,0.20);
+    --text-1: #eaf3ff;
+    --text-2: #a9c0de;
+    --text-3: #6f88a8;
+    --primary: #4dabff;
+    --primary-glow: rgba(77,171,255,0.5);
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+    --shadow-md: 0 6px 18px -8px rgba(0,0,0,0.7);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background-color .3s ease, color .3s ease;
+}
+[data-theme="dark"] body {
+    background: linear-gradient(180deg, #05080f 0%, #071226 60%, #05080f 100%);
+}
+
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: var(--radius-sm); }
+button, select, input { font-family: inherit; }
+button { cursor: pointer; user-select: none; }
+img { display: block; }
+
+/* ==================================================================
+   APP LAYOUT
+   ================================================================== */
+.app {
+    margin: 0 auto;
+    padding: 14px 12px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    max-width: 520px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================================================================
+   TOPBAR
+   ================================================================== */
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.brand-logo {
+    width: 36px; height: 36px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1; }
+.brand-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--blue-1), var(--blue-3) 60%, var(--blue-4));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+.brand-tag {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 9px;
+    letter-spacing: 3.5px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-top: 3px;
+}
+.topbar-actions { display: flex; gap: 5px; align-items: center; }
+
+.chip {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 6px 10px;
+    border-radius: var(--radius-full);
+    font-size: 11.5px;
+    font-weight: 600;
+    transition: all var(--t-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+}
+.chip:hover { background: var(--surface-2); color: var(--text-1); border-color: var(--border-strong); }
+.chip.icon { padding: 0; width: 32px; height: 32px; justify-content: center; }
+.chip.wide { width: 100%; justify-content: center; padding: 11px; font-size: 12.5px; }
+select.chip { -webkit-appearance: none; appearance: none; padding-inline-end: 8px; }
+select.chip option { background: var(--bg); color: var(--text-1); }
+
+/* ==================================================================
+   HERO
+   ================================================================== */
+.hero {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 18px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    box-shadow: var(--shadow-md);
+}
+[data-theme="dark"] .hero {
+    background: linear-gradient(180deg, #0f2242 0%, #0c1a30 100%);
+    border-color: rgba(77,171,255,0.12);
+}
+
+.status-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-2);
+    padding: 5px 11px;
+    background: var(--surface-2);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border);
+}
+.live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-3);
+    transition: background-color var(--t-base);
+}
+.live-dot.active  { background: var(--success); }
+.live-dot.running { background: var(--primary); animation: pulseRing 1.6s ease-out infinite; }
+@keyframes pulseRing {
+    0%   { box-shadow: 0 0 0 0 currentColor; }
+    100% { box-shadow: 0 0 0 12px transparent; }
+}
+
+.gauge-wrap {
+    position: relative;
+    width: min(200px, 56vw);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+}
+.gauge { width: 100%; height: 100%; overflow: visible; }
+.gauge-track {
+    fill: none;
+    stroke: var(--surface-3);
+    stroke-width: 9;
+    stroke-linecap: round;
+}
+[data-theme="dark"] .gauge-track { stroke: rgba(77,171,255,0.10); }
+.gauge-progress {
+    fill: none;
+    stroke: url(#gaugeGrad);
+    stroke-width: 9;
+    stroke-linecap: round;
+    stroke-dasharray: 424.1;
+    stroke-dashoffset: 424.1;
+    transition: stroke-dashoffset 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.gauge-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    gap: 2px;
+}
+.speed-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(32px, 10vw, 48px);
+    line-height: 1;
+    letter-spacing: -1.5px;
+    color: var(--text-1);
+    font-variant-numeric: tabular-nums;
+    min-width: 4ch;
+    text-align: center;
+    transition: color var(--t-base);
+}
+.speed-unit {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-top: 3px;
+}
+
+.quality-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    background: var(--surface-2);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 11.5px;
+    font-weight: 600;
+    transition: all var(--t-base);
+}
+.quality-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .8; }
+.quality-badge[data-level="good"] { background: rgba(16,185,129,0.1); color: var(--success); border-color: rgba(16,185,129,0.2); }
+.quality-badge[data-level="avg"]  { background: rgba(245,158,11,0.1); color: var(--warning); border-color: rgba(245,158,11,0.2); }
+.quality-badge[data-level="bad"]  { background: rgba(239,68,68,0.1);  color: var(--danger);  border-color: rgba(239,68,68,0.2); }
+
+.tag-field {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 9px 12px;
+    transition: border-color var(--t-fast);
+}
+.tag-field:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.tag-field svg { width: 15px; height: 15px; color: var(--text-3); flex-shrink: 0; }
+.tag-field input {
+    border: 0;
+    background: transparent;
+    color: var(--text-1);
+    font-size: 12.5px;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+}
+.tag-field input::placeholder { color: var(--text-3); }
+
+.cta {
+    width: 100%;
+    padding: 14px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--blue-3) 0%, var(--blue-4) 100%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--font-body);
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 18px -8px var(--primary-glow);
+    transition: transform var(--t-fast), background var(--t-base);
+}
+.cta:active:not(:disabled) { transform: scale(0.985); }
+.cta:disabled { opacity: 0.65; cursor: not-allowed; }
+.cta.running { background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); }
+.cta.done { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); }
+.cta-icon { font-size: 16px; }
+
+/* ==================================================================
+   QUICK STATS — 1 big + 3 small
+   ================================================================== */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+        "big big big"
+        "p1 p2 p3";
+    gap: 6px;
+}
+.qs {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 8px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-color var(--t-base);
+    min-height: 58px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+}
+.qs::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: currentColor;
+    opacity: 0.4;
+}
+.qs[data-role="big"] {
+    grid-area: big;
+    min-height: 78px;
+    padding: 14px 12px;
+    color: var(--primary);
+}
+.qs[data-role="ping"]   { grid-area: p1; color: var(--violet); }
+.qs[data-role="jitter"] { grid-area: p2; color: var(--warning); }
+.qs[data-role="mos"]    { grid-area: p3; color: var(--success); }
+
+.qs-label {
+    font-size: 9.5px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+}
+.qs-value {
+    font-family: var(--font-display);
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-1);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.qs[data-role="big"] .qs-value { font-size: 22px; }
+.qs-value.flash { animation: flash 0.9s ease; }
+@keyframes flash {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.18); color: var(--primary); }
+    100% { transform: scale(1); }
+}
+.qs-diff {
+    font-size: 9.5px;
+    font-weight: 700;
+    font-family: var(--font-display);
+    margin-top: 1px;
+    min-height: 11px;
+    opacity: 0;
+    transition: opacity var(--t-base);
+}
+.qs-diff.up   { color: var(--success); opacity: 1; }
+.qs-diff.down { color: var(--danger);  opacity: 1; }
+
+/* ==================================================================
+   SEGMENTED TABS
+   ================================================================== */
+.segmented {
+    display: flex;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 3px;
+    gap: 2px;
+}
+.segmented button {
+    flex: 1;
+    padding: 8px 4px;
+    border: 0;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: var(--radius-full);
+    transition: all var(--t-base);
+}
+.segmented button.active {
+    background: var(--surface-2);
+    color: var(--text-1);
+}
+[data-theme="dark"] .segmented button.active {
+    background: linear-gradient(180deg, rgba(77,171,255,0.20), rgba(77,171,255,0.10));
+    color: var(--blue-1);
+}
+
+/* ==================================================================
+   TAB CONTENT
+   ================================================================== */
+.tab-content { display: none; flex-direction: column; gap: 10px; }
+.tab-content.active { display: flex; animation: tabIn 0.3s cubic-bezier(0.4,0,0.2,1); }
+@keyframes tabIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.panel {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+}
+[data-theme="dark"] .panel {
+    background: linear-gradient(165deg, #0d1f3a 0%, #0a1830 100%);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+}
+.panel-title { font-size: 12.5px; font-weight: 700; color: var(--text-1); letter-spacing: 0.2px; }
+.panel-badge {
+    font-family: var(--font-display);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--text-3);
+    padding: 3px 7px;
+    background: var(--surface-2);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border);
+}
+.text-btn {
+    background: transparent;
+    border: 0;
+    color: var(--text-3);
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: color var(--t-fast);
+    font-family: inherit;
+}
+.text-btn:hover { color: var(--danger); }
+
+/* ==================================================================
+   GRAPH
+   ================================================================== */
+.graph-wrap {
+    position: relative;
+    width: 100%;
+    height: 130px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+[data-theme="dark"] .graph-wrap { background: #08182e; }
+#graph { width: 100%; height: 100%; display: block; cursor: crosshair; }
+.graph-empty {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 11.5px;
+    color: var(--text-3);
+    pointer-events: none;
+    transition: opacity var(--t-base);
+    text-align: center;
+    padding: 0 20px;
+}
+.graph-empty.hidden { opacity: 0; }
+.warmup-indicator {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--warning);
+    background: var(--surface-1);
+    border: 1px solid rgba(245,158,11,0.3);
+    padding: 3px 7px;
+    border-radius: var(--radius-full);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity var(--t-base), transform var(--t-base);
+    pointer-events: none;
+    z-index: 4;
+    letter-spacing: 0.5px;
+}
+.warmup-indicator.active { opacity: 1; transform: translateY(0); animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+.graph-tip {
+    position: absolute;
+    top: 0;
+    transform: translate(-50%, -100%);
+    background: var(--surface-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 5px 8px;
+    pointer-events: none;
+    box-shadow: var(--shadow-md);
+    font-size: 10.5px;
+    line-height: 1.3;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity var(--t-fast);
+    z-index: 5;
+}
+.graph-tip.show { opacity: 1; }
+.graph-tip .tt-speed { font-family: var(--font-display); font-weight: 700; color: var(--primary); font-size: 12px; }
+.graph-tip .tt-time { color: var(--text-3); font-size: 9.5px; }
+
+/* ==================================================================
+   CONNECTION SCORE + READINESS BARS
+   ================================================================== */
+.score-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+}
+.score-gauge-wrap {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+}
+.score-gauge { width: 100%; height: 100%; transform: rotate(-90deg); }
+.sg-track { fill: none; stroke: var(--surface-3); stroke-width: 6; }
+[data-theme="dark"] .sg-track { stroke: rgba(77,171,255,0.12); }
+.sg-progress {
+    fill: none;
+    stroke: url(#scoreGrad);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 251.3;
+    stroke-dashoffset: 251.3;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.score-value-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+.score-number {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1;
+    color: var(--text-1);
+    font-variant-numeric: tabular-nums;
+}
+.score-out-of {
+    font-size: 9.5px;
+    color: var(--text-3);
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-top: 2px;
+}
+.score-info { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.score-info-label { font-size: 10.5px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.score-info-grade {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-1);
+    line-height: 1.1;
+}
+.score-info-desc { font-size: 11.5px; color: var(--text-2); line-height: 1.3; }
+
+.readiness-list { display: flex; flex-direction: column; gap: 10px; }
+.readiness-item { display: flex; flex-direction: column; gap: 5px; }
+.readiness-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    gap: 8px;
+}
+.readiness-label { color: var(--text-2); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.readiness-label .ico { font-size: 13px; }
+.readiness-pct { font-family: var(--font-display); font-weight: 700; color: var(--text-1); font-variant-numeric: tabular-nums; }
+.readiness-bar {
+    height: 6px;
+    background: var(--surface-3);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+[data-theme="dark"] .readiness-bar { background: rgba(77,171,255,0.10); }
+.readiness-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    width: 0%;
+    transition: width 0.7s cubic-bezier(0.4,0,0.2,1), background 0.3s ease;
+    background: linear-gradient(90deg, var(--blue-2), var(--primary));
+}
+.readiness-fill[data-level="good"] { background: linear-gradient(90deg, #6ee7b7, var(--success)); }
+.readiness-fill[data-level="avg"]  { background: linear-gradient(90deg, #fcd34d, var(--warning)); }
+.readiness-fill[data-level="bad"]  { background: linear-gradient(90deg, #fca5a5, var(--danger)); }
+
+/* ==================================================================
+   CALCULATOR
+   ================================================================== */
+.calc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-2);
+    gap: 8px;
+}
+.calc-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.calc-row:first-of-type { padding-top: 0; }
+.calc-val {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-1);
+    font-variant-numeric: tabular-nums;
+    font-size: 12.5px;
+}
+.calc-row-input { gap: 10px; }
+.calc-row-input > span:first-child { flex-shrink: 0; }
+.size-input { display: flex; gap: 6px; flex: 1; justify-content: flex-end; }
+.size-input input {
+    width: 90px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-1);
+    font-family: var(--font-display);
+    font-size: 12.5px;
+    font-weight: 700;
+    outline: none;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    transition: border-color var(--t-fast);
+}
+.size-input input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.size-input select {
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-1);
+    font-family: var(--font-display);
+    font-size: 11.5px;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    padding-inline-end: 6px;
+}
+.size-input select option { background: var(--bg); color: var(--text-1); }
+
+/* ==================================================================
+   DETAILS
+   ================================================================== */
+.metrics-list { display: flex; flex-direction: column; }
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--text-2);
+}
+.metric-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.metric-row:first-child { padding-top: 0; }
+.metric-row-val {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-1);
+    font-variant-numeric: tabular-nums;
+}
+
+.score-list { display: flex; flex-direction: column; gap: 2px; }
+.score-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+}
+.score-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.score-item:first-child { padding-top: 0; }
+.score-icon {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+}
+.score-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.score-label { font-size: 11px; color: var(--text-3); font-weight: 500; }
+.score-value { font-size: 12.5px; font-weight: 700; color: var(--text-1); }
+
+.net-info { display: flex; flex-direction: column; }
+.net-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-2);
+    gap: 10px;
+}
+.net-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.net-row:first-child { padding-top: 0; }
+.net-row span:last-child {
+    color: var(--text-1);
+    font-weight: 600;
+    font-family: var(--font-display);
+    text-align: end;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%;
+}
+
+/* ==================================================================
+   IDENTITY CARD
+   ================================================================== */
+.id-card {
+    position: relative;
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f2242 0%, #1e5fc4 60%, #4dabff 100%);
+    color: #fff;
+    box-shadow: 0 10px 30px -14px rgba(30,95,196,0.6);
+}
+.id-card::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -30%;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%);
+    pointer-events: none;
+}
+.id-card::after {
+    content: '';
+    position: absolute;
+    bottom: -50%; left: -20%;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(77,171,255,0.35), transparent 70%);
+    pointer-events: none;
+}
+.id-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+}
+.id-card-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 2px;
+}
+.id-card-brand img { width: 20px; height: 20px; filter: brightness(0) invert(1); }
+.id-card-badge {
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 9px;
+    border-radius: var(--radius-full);
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: none;
+    border: 1px solid rgba(255,255,255,0.25);
+}
+.id-card-body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; }
+.id-card-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.id-card-key {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    font-weight: 600;
+}
+.id-card-val {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: end;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%;
+}
+.id-card-footer {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.18);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+.id-card-footer-left { display: flex; flex-direction: column; gap: 3px; }
+.id-card-footer-label { font-size: 10px; opacity: 0.7; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+.id-card-speed {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+}
+.id-card-grade {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -1px;
+    text-shadow: 0 0 20px rgba(255,255,255,0.35);
+}
+
+/* ==================================================================
+   HISTORY — redesigned
+   ================================================================== */
+.history-list { display: flex; flex-direction: column; gap: 8px; }
+.history-empty {
+    text-align: center;
+    padding: 26px 10px;
+    color: var(--text-3);
+    font-size: 12px;
+}
+.history-item {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 11px 12px;
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+    animation: tabIn 0.3s ease;
+}
+[data-theme="dark"] .history-item { background: #0d1f3a; }
+.history-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: var(--font-display);
+    background: var(--surface-1);
+    border: 2px solid var(--surface-3);
+    color: var(--text-1);
+}
+.history-avatar[data-grade="good"] { border-color: var(--success); background: rgba(16,185,129,0.12); color: var(--success); }
+.history-avatar[data-grade="avg"]  { border-color: var(--warning); background: rgba(245,158,11,0.12); color: var(--warning); }
+.history-avatar[data-grade="bad"]  { border-color: var(--danger);  background: rgba(239,68,68,0.12);  color: var(--danger); }
+
+.history-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.history-tag {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.history-tag.empty { color: var(--text-3); font-weight: 500; font-style: italic; }
+.history-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: var(--font-display);
+    flex-wrap: wrap;
+}
+.history-meta-item { display: inline-flex; align-items: center; gap: 3px; }
+.history-meta-item b { color: var(--text-2); font-weight: 700; }
+
+.history-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.history-speed {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+}
+.history-time {
+    font-size: 9px;
+    color: var(--text-3);
+    font-family: var(--font-display);
+}
+.history-item-del {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: transparent;
+    border: 0;
+    color: var(--text-3);
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+    transition: all var(--t-fast);
+    opacity: 0;
+}
+.history-item:hover .history-item-del,
+.history-item:focus-within .history-item-del { opacity: 1; }
+@media (hover: none) { .history-item-del { opacity: 0.6; } }
+.history-item-del:hover { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+/* ==================================================================
+   TRENDS
+   ================================================================== */
+.trend-filter {
+    display: flex;
+    background: var(--surface-2);
+    border-radius: var(--radius-full);
+    padding: 3px;
+    gap: 2px;
+    margin-bottom: 12px;
+}
+.trend-filter button {
+    flex: 1;
+    padding: 6px 4px;
+    border: 0;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 10.5px;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: var(--radius-full);
+    transition: all var(--t-base);
+}
+.trend-filter button.active {
+    background: var(--surface-1);
+    color: var(--text-1);
+    box-shadow: var(--shadow-sm);
+}
+[data-theme="dark"] .trend-filter button.active {
+    background: linear-gradient(180deg, rgba(77,171,255,0.22), rgba(77,171,255,0.10));
+    color: var(--blue-1);
+    box-shadow: none;
+}
+
+.trend-chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+[data-theme="dark"] .trend-chart-wrap { background: #08182e; }
+#trendChart { width: 100%; height: 100%; display: block; }
+.trend-empty {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 11.5px;
+    color: var(--text-3);
+    text-align: center;
+    padding: 0 20px;
+}
+
+.trend-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+}
+.trend-stat {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 6px;
+    text-align: center;
+}
+.trend-stat-label {
+    font-size: 9px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+}
+.trend-stat-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-1);
+    margin-top: 3px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==================================================================
+   FOOTER
+   ================================================================== */
+.app-footer { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 2px; }
+.ghost-btn {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 9px 5px;
+    border-radius: var(--radius-md);
+    font-size: 10px;
+    font-weight: 600;
+    font-family: inherit;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    transition: background-color var(--t-fast), color var(--t-fast);
+}
+.ghost-btn span:first-child { font-size: 14px; line-height: 1; }
+.ghost-btn:hover { background: var(--surface-2); color: var(--text-1); }
+
+/* ==================================================================
+   FAB
+   ================================================================== */
+.fab {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 0;
+    background: linear-gradient(135deg, var(--blue-3), var(--blue-4));
+    color: #fff;
+    font-size: 22px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 10px 25px -8px rgba(30,95,196,0.6), 0 0 0 4px rgba(30,95,196,0.12);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34,1.4,0.64,1), background 0.3s ease;
+    font-family: var(--font-display);
+}
+.fab.visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+.fab:active { transform: translateX(-50%) scale(0.94); }
+.fab.running {
+    background: linear-gradient(135deg, var(--warning), #d97706);
+    box-shadow: 0 10px 25px -8px rgba(245,158,11,0.6), 0 0 0 4px rgba(245,158,11,0.12);
+}
+.fab.running .fab-icon { animation: fabSpin 1.6s linear infinite; }
+@keyframes fabSpin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+/* ==================================================================
+   SHEETS
+   ================================================================== */
+.sheet {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    display: none;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 10px;
+}
+.sheet.active { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.sheet-content {
+    background: var(--surface-1);
+    width: 100%;
+    max-width: 520px;
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-lg) var(--radius-lg);
+    border: 1px solid var(--border);
+    max-height: 88vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: sheetUp 0.32s cubic-bezier(0.34,1.2,0.64,1);
+}
+[data-theme="dark"] .sheet-content { background: #0c1a30; }
+@keyframes sheetUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+.sheet-grab { width: 34px; height: 4px; background: var(--text-3); border-radius: 2px; opacity: 0.4; margin: 8px auto 0; }
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+.sheet-title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--text-1); letter-spacing: 0.3px; }
+.sheet-close {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    font-size: 16px;
+    display: grid;
+    place-items: center;
+    transition: background-color var(--t-fast);
+    line-height: 1;
+}
+.sheet-close:hover { background: var(--surface-3); color: var(--text-1); }
+.sheet-body { padding: 14px 16px 18px; overflow-y: auto; flex: 1; }
+
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field-label {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 7px;
+}
+.duration-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.duration-options button {
+    padding: 10px 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: background-color var(--t-fast), color var(--t-fast);
+}
+.duration-options button:hover { border-color: var(--border-strong); color: var(--text-1); }
+.duration-options button.active {
+    background: linear-gradient(135deg, var(--blue-3), var(--blue-4));
+    color: #fff;
+    border-color: transparent;
+}
+
+.dev-log {
+    background: #030a17;
+    color: #4dabff;
+    font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+    font-size: 10.5px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    direction: ltr;
+    text-align: left;
+    max-height: 340px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.55;
+    border: 1px solid rgba(77,171,255,0.15);
+}
+
+.api-section { direction: ltr; text-align: left; }
+.api-endpoint {
+    background: var(--surface-2);
+    color: var(--danger);
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    font-family: ui-monospace, monospace;
+    font-size: 11.5px;
+    margin: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+}
+[data-theme="dark"] .api-endpoint { color: var(--blue-2); }
+.api-endpoint code { flex: 1; word-break: break-all; }
+.api-copy-btn {
+    background: linear-gradient(135deg, var(--blue-3), var(--blue-4));
+    color: #fff;
+    border: 0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: inherit;
+    white-space: nowrap;
+}
+.api-info { color: var(--text-2); font-size: 11.5px; line-height: 1.6; margin-top: 8px; }
+.api-example {
+    background: var(--surface-2);
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    margin-top: 8px;
+    font-family: ui-monospace, monospace;
+    font-size: 10.5px;
+    color: var(--text-1);
+    direction: ltr;
+    overflow-x: auto;
+    white-space: pre;
+    border: 1px solid var(--border);
+}
+
+/* ==================================================================
+   TOAST
+   ================================================================== */
+.toast {
+    position: fixed;
+    bottom: 88px;
+    left: 50%;
+    transform: translate(-50%, 20px);
+    background: var(--surface-1);
+    color: var(--text-1);
+    border: 1px solid var(--border-strong);
+    padding: 11px 16px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.34,1.2,0.64,1);
+    max-width: 90vw;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.success { border-color: rgba(16,185,129,0.3); color: var(--success); }
+.toast.error   { border-color: rgba(239,68,68,0.3);  color: var(--danger); }
+
+/* ==================================================================
+   RESPONSIVE
+   ================================================================== */
+@media (max-width: 400px) {
+    .quick-stats { grid-template-columns: repeat(3, 1fr); }
+    .qs[data-role="big"] .qs-value { font-size: 20px; }
+    .history-item { grid-template-columns: 34px 1fr auto; padding: 10px; }
+    .history-avatar { width: 34px; height: 34px; font-size: 15px; }
+    .app-footer { grid-template-columns: repeat(2, 1fr); }
+    .brand-name { font-size: 15px; letter-spacing: 1.5px; }
+    .brand-tag { font-size: 8px; letter-spacing: 3px; }
+    .segmented button { font-size: 10px; padding: 7px 3px; }
+    .score-block { flex-direction: column; text-align: center; gap: 12px; }
+    .score-info { align-items: center; }
+    .trend-summary { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+}
+
+@media (min-width: 900px) {
+    .app { max-width: 720px; padding: 20px 20px 100px; gap: 14px; }
+
+    .quick-stats {
+        grid-template-columns: 1.6fr 1fr;
+        grid-template-areas:
+            "big p1"
+            "big p2"
+            "big p3";
+        grid-template-rows: 1fr 1fr 1fr;
+        gap: 8px;
+    }
+    .qs[data-role="big"] { min-height: auto; padding: 20px; }
+    .qs[data-role="big"] .qs-value { font-size: 30px; }
+    .qs { min-height: 62px; }
+    .qs-value { font-size: 15px; }
+
+    .hero { padding: 26px 22px 22px; gap: 16px; }
+    .gauge-wrap { width: min(240px, 26vw); }
+    .speed-value { font-size: clamp(40px, 5vw, 56px); }
+    .brand-logo { width: 42px; height: 42px; }
+    .brand-name { font-size: 19px; }
+
+    .panel { padding: 18px; }
+    .graph-wrap { height: 190px; }
+    .trend-chart-wrap { height: 230px; }
+    .segmented button { padding: 10px 12px; font-size: 13px; }
+    .cta { padding: 16px; font-size: 15px; }
+
+    .metric-row, .net-row { font-size: 13.5px; padding: 12px 0; }
+    .score-item { padding: 12px 0; }
+    .score-icon { width: 40px; height: 40px; font-size: 18px; }
+    .score-label { font-size: 12px; }
+    .score-value { font-size: 14px; }
+
+    .score-gauge-wrap { width: 120px; height: 120px; }
+    .score-number { font-size: 34px; }
+    .score-info-grade { font-size: 22px; }
+    .score-info-desc { font-size: 13px; }
+    .readiness-item { gap: 6px; }
+    .readiness-bar { height: 7px; }
+
+    .history-item { grid-template-columns: 48px 1fr auto; padding: 14px; }
+    .history-avatar { width: 48px; height: 48px; font-size: 20px; }
+    .history-tag { font-size: 13.5px; }
+    .history-speed { font-size: 16px; }
+
+    .app-footer { gap: 8px; }
+    .ghost-btn { padding: 12px 8px; font-size: 12px; }
+    .ghost-btn span:first-child { font-size: 17px; }
+
+    .fab { bottom: 30px; left: auto; right: 30px; transform: translateX(0) translateY(80px); width: 60px; height: 60px; font-size: 24px; }
+    .fab.visible { transform: translateX(0) translateY(0); }
+    .fab:active { transform: translateX(0) scale(0.94); }
+}
+
+/* ==================================================================
+   PERFORMANCE MODE (auto on weak devices)
+   ================================================================== */
+.perf-low * {
+    animation-duration: 0.001ms !important;
+}
+.perf-low .live-dot.running,
+.perf-low .warmup-indicator.active { animation: pulse 2s ease-in-out infinite !important; }
+.perf-low .gauge-progress,
+.perf-low .sg-progress,
+.perf-low .readiness-fill { transition-duration: 0.15s !important; }
+.perf-low .tab-content.active { animation: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- ============ TOPBAR ============ -->
+    <header class="topbar">
+        <a class="brand" href="./" aria-label="Techovia">
+            <img class="brand-logo" src="./assets/logo.svg" alt="Techovia" width="36" height="36">
+            <div class="brand-text">
+                <span class="brand-name">TECHOVIA</span>
+                <span class="brand-tag" data-i18n="brandTag">Speed Test</span>
+            </div>
+        </a>
+        <div class="topbar-actions">
+            <select id="langSelect" class="chip" aria-label="Language" data-i18n-aria="language">
+                <option value="ar">🇸🇦 AR</option>
+                <option value="en">🇬🇧 EN</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="de">🇩🇪 DE</option>
+                <option value="es">🇪🇸 ES</option>
+                <option value="tr">🇹🇷 TR</option>
+                <option value="nl">🇳🇱 NL</option>
+            </select>
+            <button class="chip icon" id="themeToggle" aria-label="Theme" data-i18n-aria="toggleTheme">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <button class="chip icon" id="settingsBtn" aria-label="Settings" data-i18n-aria="settings">⚙️</button>
+        </div>
+    </header>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+        <div class="status-line">
+            <span class="live-dot" id="liveDot"></span>
+            <span id="statusText" data-i18n="ready">جاهز للفحص</span>
+        </div>
+
+        <div class="gauge-wrap">
+            <svg class="gauge" viewBox="0 0 200 200" aria-hidden="true">
+                <defs>
+                    <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%"   stop-color="#b6e1ff"/>
+                        <stop offset="45%"  stop-color="#4dabff"/>
+                        <stop offset="100%" stop-color="#1e5fc4"/>
+                    </linearGradient>
+                </defs>
+                <path class="gauge-track"    d="M 36.4 163.6 A 90 90 0 1 1 163.6 163.6"/>
+                <path class="gauge-progress" id="gaugeProgress" d="M 36.4 163.6 A 90 90 0 1 1 163.6 163.6"/>
+            </svg>
+            <div class="gauge-center">
+                <div class="speed-value" id="speed">0.00</div>
+                <div class="speed-unit"  id="statusUnit">MB/s</div>
+            </div>
+        </div>
+
+        <div class="quality-badge" id="quality">
+            <span class="dot"></span>
+            <span id="qualityText" data-i18n="qNone">غير متاح</span>
+        </div>
+
+        <div class="tag-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            <input type="text" id="tagInput" maxlength="40"
+                   data-i18n-placeholder="tagPlaceholder"
+                   placeholder="أضف وسماً">
+        </div>
+
+        <button class="cta" id="btnStart">
+            <span class="cta-icon" aria-hidden="true">⚡</span>
+            <span id="ctaText" data-i18n="btnStart">بدء الاختبار</span>
+        </button>
+    </section>
+
+    <!-- ============ QUICK STATS (1 big + 3 small) ============ -->
+    <section class="quick-stats">
+        <div class="qs" data-role="big">
+            <span class="qs-label" data-i18n="qsDownload">تحميل</span>
+            <span class="qs-value" id="down">-</span>
+            <span class="qs-diff"  id="downDiff"></span>
+        </div>
+        <div class="qs" data-role="ping">
+            <span class="qs-label" data-i18n="qsPing">استجابة</span>
+            <span class="qs-value" id="ping">-</span>
+        </div>
+        <div class="qs" data-role="jitter">
+            <span class="qs-label" data-i18n="qsJitter">تقلب</span>
+            <span class="qs-value" id="jitter">-</span>
+        </div>
+        <div class="qs" data-role="mos">
+            <span class="qs-label" data-i18n="qsMos">MOS</span>
+            <span class="qs-value" id="mos">-</span>
+        </div>
+    </section>
+
+    <!-- ============ TABS ============ -->
+    <nav class="segmented" role="tablist" aria-label="Sections">
+        <button data-tab="overview" class="active" role="tab" data-i18n="tabOverview">نظرة عامة</button>
+        <button data-tab="details"  role="tab" data-i18n="tabDetails">التفاصيل</button>
+        <button data-tab="trends"   role="tab" data-i18n="tabTrends">الاتجاهات</button>
+        <button data-tab="history"  role="tab" data-i18n="tabHistory">السجل</button>
+    </nav>
+
+    <!-- ============ TAB: OVERVIEW ============ -->
+    <section class="tab-content active" data-tab="overview">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" data-i18n="graphTitle">مخطط السرعة اللحظي</span>
+                <span class="panel-badge" id="graphLabel">MB/s</span>
+            </div>
+            <div class="graph-wrap" id="graphWrap">
+                <canvas id="graph" role="img" aria-label="Speed graph"></canvas>
+                <div class="graph-empty" id="graphEmpty" data-i18n="graphEmpty">ابدأ الاختبار لعرض المخطط</div>
+                <div class="warmup-indicator" id="warmupIndicator">
+                    <span aria-hidden="true">⏱️</span>
+                    <span data-i18n="warmup">تسخين</span>
+                </div>
+                <div class="graph-tip" id="graphTip">
+                    <div class="tt-speed" id="ttSpeed">0.00 MB/s</div>
+                    <div class="tt-time"  id="ttTime">0.0s</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" data-i18n="scoreTitle">درجة الاتصال</span>
+                <span class="panel-badge" data-i18n="scoreBadge">/100</span>
+            </div>
+
+            <div class="score-block">
+                <div class="score-gauge-wrap">
+                    <svg class="score-gauge" viewBox="0 0 100 100" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%"   stop-color="#b6e1ff"/>
+                                <stop offset="50%"  stop-color="#4dabff"/>
+                                <stop offset="100%" stop-color="#1e5fc4"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="sg-track" cx="50" cy="50" r="40"/>
+                        <circle class="sg-progress" id="scoreProgress" cx="50" cy="50" r="40"/>
+                    </svg>
+                    <div class="score-value-wrap">
+                        <div class="score-number" id="scoreNumber">--</div>
+                        <div class="score-out-of">/100</div>
+                    </div>
+                </div>
+                <div class="score-info">
+                    <span class="score-info-label" data-i18n="scoreOverall">التقييم العام</span>
+                    <span class="score-info-grade" id="scoreGrade" data-i18n="scoreNoData">--</span>
+                    <span class="score-info-desc" id="scoreDesc" data-i18n="scoreDescEmpty">أجرِ اختباراً لعرض التقييم</span>
+                </div>
+            </div>
+
+            <div class="readiness-list">
+                <div class="readiness-item">
+                    <div class="readiness-top">
+                        <span class="readiness-label"><span class="ico">📺</span><span data-i18n="readinessStreaming">البث</span></span>
+                        <span class="readiness-pct" id="rdStreamingPct">--%</span>
+                    </div>
+                    <div class="readiness-bar"><div class="readiness-fill" id="rdStreamingFill"></div></div>
+                </div>
+                <div class="readiness-item">
+                    <div class="readiness-top">
+                        <span class="readiness-label"><span class="ico">🎮</span><span data-i18n="readinessGaming">الألعاب</span></span>
+                        <span class="readiness-pct" id="rdGamingPct">--%</span>
+                    </div>
+                    <div class="readiness-bar"><div class="readiness-fill" id="rdGamingFill"></div></div>
+                </div>
+                <div class="readiness-item">
+                    <div class="readiness-top">
+                        <span class="readiness-label"><span class="ico">📞</span><span data-i18n="readinessCalls">المكالمات</span></span>
+                        <span class="readiness-pct" id="rdCallsPct">--%</span>
+                    </div>
+                    <div class="readiness-bar"><div class="readiness-fill" id="rdCallsFill"></div></div>
+                </div>
+                <div class="readiness-item">
+                    <div class="readiness-top">
+                        <span class="readiness-label"><span class="ico">⬇️</span><span data-i18n="readinessDownload">التنزيل</span></span>
+                        <span class="readiness-pct" id="rdDownloadPct">--%</span>
+                    </div>
+                    <div class="readiness-bar"><div class="readiness-fill" id="rdDownloadFill"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" data-i18n="calcTitle">حاسبة زمن التحميل</span>
+            </div>
+            <div class="calc-row">
+                <span data-i18n="time1gb">زمن تحميل 1 جيجابايت:</span>
+                <span class="calc-val" id="time1gb">--:--</span>
+            </div>
+            <div class="calc-row calc-row-input">
+                <span data-i18n="customSize">حجم مخصص:</span>
+                <div class="size-input">
+                    <input type="number" id="sizeInput" value="1000"
+                           min="0.01" step="any" inputmode="decimal" aria-label="Custom size">
+                    <select id="sizeUnit" aria-label="Unit">
+                        <option value="0.0009765625">KB</option>
+                        <option value="1" selected>MB</option>
+                        <option value="1024">GB</option>
+                        <option value="1048576">TB</option>
+                    </select>
+                </div>
+            </div>
+            <div class="calc-row">
+                <span data-i18n="customTime">الزمن المتوقع:</span>
+                <span class="calc-val" id="customTime">--:--</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ TAB: DETAILS ============ -->
+    <section class="tab-content" data-tab="details">
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title" data-i18n="advMetrics">مقاييس متقدمة</span></div>
+            <div class="metrics-list">
+                <div class="metric-row"><span data-i18n="stab">الاستقرار</span><span class="metric-row-val" id="stability">-</span></div>
+                <div class="metric-row"><span data-i18n="noise">التشويش</span><span class="metric-row-val" id="noise">-</span></div>
+                <div class="metric-row"><span data-i18n="bloat">Bufferbloat</span><span class="metric-row-val" id="bufferbloat">-</span></div>
+                <div class="metric-row"><span data-i18n="jitterPct">تذبذب السرعة</span><span class="metric-row-val" id="jitterPct">-</span></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title" data-i18n="usageQuality">تقييم جودة الاستخدام</span></div>
+            <div class="score-list">
+                <div class="score-item">
+                    <div class="score-icon" aria-hidden="true">🎮</div>
+                    <div class="score-body">
+                        <span class="score-label" data-i18n="gaming">أداء الألعاب التنافسية</span>
+                        <span class="score-value" id="scoreGaming">-</span>
+                    </div>
+                </div>
+                <div class="score-item">
+                    <div class="score-icon" aria-hidden="true">📺</div>
+                    <div class="score-body">
+                        <span class="score-label" data-i18n="stream">جودة بث الفيديو</span>
+                        <span class="score-value" id="scoreStream">-</span>
+                    </div>
+                </div>
+                <div class="score-item">
+                    <div class="score-icon" aria-hidden="true">🎥</div>
+                    <div class="score-body">
+                        <span class="score-label" data-i18n="videoSpeed">سرعة تشغيل الفيديو</span>
+                        <span class="score-value" id="videoSpeed">-</span>
+                    </div>
+                </div>
+                <div class="score-item">
+                    <div class="score-icon" aria-hidden="true">🎞️</div>
+                    <div class="score-body">
+                        <span class="score-label" data-i18n="videoRes">دقة الفيديو المناسبة</span>
+                        <span class="score-value" id="videoResolution">-</span>
+                    </div>
+                </div>
+                <div class="score-item">
+                    <div class="score-icon" aria-hidden="true">📞</div>
+                    <div class="score-body">
+                        <span class="score-label" data-i18n="calls">مكالمات الفيديو</span>
+                        <span class="score-value" id="scoreCalls">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title" data-i18n="netInfo">معلومات الشبكة</span></div>
+            <div class="net-info">
+                <div class="net-row"><span data-i18n="netType">نوع الاتصال</span><span id="netType">-</span></div>
+                <div class="net-row"><span data-i18n="netISP">مزود الخدمة</span><span id="netISP">-</span></div>
+                <div class="net-row"><span data-i18n="netLocation">الموقع</span><span id="netLocation">-</span></div>
+                <div class="net-row"><span data-i18n="netIP">عنوان IP</span><span id="netIP">-</span></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><span class="panel-title" data-i18n="identityTitle">بطاقة الاتصال</span></div>
+            <div class="id-card" id="idCard">
+                <div class="id-card-head">
+                    <div class="id-card-brand">
+                        <img src="./assets/logo.svg" alt="">
+                        <span>TECHOVIA</span>
+                    </div>
+                    <span class="id-card-badge" id="idCardBadge">--</span>
+                </div>
+                <div class="id-card-body">
+                    <div class="id-card-row">
+                        <span class="id-card-key" data-i18n="netISP">مزود الخدمة</span>
+                        <span class="id-card-val" id="idCardISP">-</span>
+                    </div>
+                    <div class="id-card-row">
+                        <span class="id-card-key" data-i18n="netLocation">الموقع</span>
+                        <span class="id-card-val" id="idCardLocation">-</span>
+                    </div>
+                    <div class="id-card-row">
+                        <span class="id-card-key" data-i18n="netIP">عنوان IP</span>
+                        <span class="id-card-val" id="idCardIP">-</span>
+                    </div>
+                </div>
+                <div class="id-card-footer">
+                    <div class="id-card-footer-left">
+                        <span class="id-card-footer-label" data-i18n="idSpeed">السرعة</span>
+                        <span class="id-card-speed" id="idCardSpeed">-- MB/s</span>
+                    </div>
+                    <div>
+                        <span class="id-card-footer-label" data-i18n="idGrade">التقدير</span>
+                        <div class="id-card-grade" id="idCardGrade">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ TAB: TRENDS ============ -->
+    <section class="tab-content" data-tab="trends">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" data-i18n="trendsTitle">تطور السرعة</span>
+                <span class="panel-badge" data-i18n="trendsUnit">MB/s</span>
+            </div>
+            <div class="trend-filter" id="trendFilter">
+                <button data-days="1" class="active" data-i18n="trendToday">اليوم</button>
+                <button data-days="7" data-i18n="trend7">7 أيام</button>
+                <button data-days="30" data-i18n="trend30">30 يوم</button>
+                <button data-days="0" data-i18n="trendAll">الكل</button>
+            </div>
+            <div class="trend-chart-wrap">
+                <canvas id="trendChart" role="img" aria-label="Trend chart"></canvas>
+                <div class="trend-empty" id="trendEmpty" data-i18n="trendNoData">لا يوجد بيانات كافية</div>
+            </div>
+            <div class="trend-summary">
+                <div class="trend-stat">
+                    <div class="trend-stat-label" data-i18n="trendAvg">المتوسط</div>
+                    <div class="trend-stat-value" id="trendAvgVal">-</div>
+                </div>
+                <div class="trend-stat">
+                    <div class="trend-stat-label" data-i18n="trendBest">الأفضل</div>
+                    <div class="trend-stat-value" id="trendBestVal">-</div>
+                </div>
+                <div class="trend-stat">
+                    <div class="trend-stat-label" data-i18n="trendCount">الاختبارات</div>
+                    <div class="trend-stat-value" id="trendCountVal">-</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ TAB: HISTORY ============ -->
+    <section class="tab-content" data-tab="history">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" data-i18n="historyTitle">آخر الاختبارات</span>
+                <button class="text-btn" id="clearHistory" data-i18n="clearAll">مسح الكل</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="history-empty" data-i18n="noHistory">لا يوجد سجل بعد</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="app-footer">
+        <button class="ghost-btn" id="shareBtn">
+            <span aria-hidden="true">↗</span>
+            <span data-i18n="share">مشاركة</span>
+        </button>
+        <button class="ghost-btn" id="shareImageBtn">
+            <span aria-hidden="true">🖼️</span>
+            <span data-i18n="image">صورة</span>
+        </button>
+        <button class="ghost-btn" id="copyBtn">
+            <span aria-hidden="true">📋</span>
+            <span data-i18n="copy">نسخ</span>
+        </button>
+        <button class="ghost-btn" id="exportBtn">
+            <span aria-hidden="true">⬇️</span>
+            <span data-i18n="export">JSON</span>
+        </button>
+    </footer>
+</div>
+
+<!-- ============ FAB ============ -->
+<button class="fab" id="fab" aria-label="Start">
+    <span class="fab-icon" id="fabIcon">⚡</span>
+</button>
+
+<!-- ============ SETTINGS SHEET ============ -->
+<div class="sheet" id="settingsSheet" data-sheet="settings">
+    <div class="sheet-content">
+        <div class="sheet-grab"></div>
+        <div class="sheet-header">
+            <span class="sheet-title" data-i18n="settings">الإعدادات</span>
+            <button class="sheet-close" data-close="settings" aria-label="Close">×</button>
+        </div>
+        <div class="sheet-body">
+            <div class="field">
+                <label class="field-label" data-i18n="durationLabel">مدة اختبار التنزيل</label>
+                <div class="duration-options" id="durationOptions">
+                    <button data-duration="10"><span data-i18n="dur10">10 ثوان</span></button>
+                    <button data-duration="15"><span data-i18n="dur15">15 ثانية</span></button>
+                    <button data-duration="30" class="active"><span data-i18n="dur30">30 ثانية</span></button>
+                    <button data-duration="60"><span data-i18n="dur60">60 ثانية</span></button>
+                </div>
+            </div>
+            <div class="field">
+                <label class="field-label" data-i18n="devTools">أدوات المطوّر</label>
+                <button class="chip wide" data-open="dev">
+                    <span aria-hidden="true">🛠️</span>
+                    <span data-i18n="openDev">فتح سجل المطوّر</span>
+                </button>
+            </div>
+            <div class="field">
+                <label class="field-label" data-i18n="apiLabel">واجهة برمجة Mini API</label>
+                <button class="chip wide" data-open="api">
+                    <span aria-hidden="true">🔗</span>
+                    <span data-i18n="viewApi">عرض مستندات API</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ DEV SHEET ============ -->
+<div class="sheet" id="devSheet" data-sheet="dev">
+    <div class="sheet-content">
+        <div class="sheet-grab"></div>
+        <div class="sheet-header">
+            <span class="sheet-title" data-i18n="devTitle">Developer Console</span>
+            <button class="sheet-close" data-close="dev" aria-label="Close">×</button>
+        </div>
+        <div class="sheet-body">
+            <div class="dev-log" id="devPanel">Log initialized...</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ API SHEET ============ -->
+<div class="sheet" id="apiSheet" data-sheet="api">
+    <div class="sheet-content">
+        <div class="sheet-grab"></div>
+        <div class="sheet-header">
+            <span class="sheet-title" data-i18n="apiTitle">Techovia Mini API</span>
+            <button class="sheet-close" data-close="api" aria-label="Close">×</button>
+        </div>
+        <div class="sheet-body">
+            <div class="api-section">
+                <div class="api-info">
+                    <strong>Access Test Results Programmatically</strong><br>
+                    Retrieve the latest results from the browser console.
+                </div>
+                <div class="api-endpoint">
+                    <code>window.TechoviaAPI.results</code>
+                    <button class="api-copy-btn" data-copy="window.TechoviaAPI.results">Copy</button>
+                </div>
+                <div class="api-info"><strong>Response:</strong></div>
+                <div class="api-example">{
+  "ping": 0,
+  "jitter": 0,
+  "bufferbloat": 0,
+  "download": 0,
+  "stability": 0,
+  "noise": 0,
+  "jitterPct": 0,
+  "mos": 0,
+  "score": 0,
+  "timestamp": "..."
+}</div>
+                <div class="api-info" style="margin-top:12px"><strong>Methods:</strong></div>
+                <div class="api-example">window.TechoviaAPI.results   // latest results
+window.TechoviaAPI.history   // history array
+window.TechoviaAPI.start()   // start a new test</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// =====================================================================
+// TECHOVIA SPEED TEST v6.0 — single file, performance-optimized
+// =====================================================================
+(function() {
+'use strict';
+
+// ---------- CONFIG ----------
+const CONFIG = {
+    DOWNLOAD_CHUNK_SIZE: 500 * 1024 * 1024,
+    PING_COUNT: 5,
+    GRAPH_MAX_POINTS: 250,
+    UI_UPDATE_INTERVAL: 200,
+    BLOAT_CHECK_INTERVAL: 1000,
+    DOWNLOAD_URL: 'https://speed.cloudflare.com/__down',
+    PING_URL: 'https://speed.cloudflare.com/__down?bytes=0',
+    HISTORY_KEY: 'techovia_history_v6',
+    HISTORY_MAX: 20,
+    LANG_KEY: 'techovia_lang',
+    THEME_KEY: 'techovia_theme'
+};
+
+// ---------- DEVICE / PERFORMANCE DETECTION ----------
+const device = {
+    cores: navigator.hardwareConcurrency || 4,
+    memory: navigator.deviceMemory || 4,
+    isTouch: (('ontouchstart' in window) || navigator.maxTouchPoints > 0),
+    prefersReducedMotion: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    isDesktop: window.matchMedia && window.matchMedia('(min-width: 900px)').matches
+};
+device.isLowEnd = device.cores <= 4 || device.memory <= 2 || device.prefersReducedMotion;
+if (device.isLowEnd) document.documentElement.classList.add('perf-low');
+
+// ---------- STATE ----------
+const state = {
+    speeds: [],
+    currentMax: 5,
+    lastFinalSpeed: 0,
+    basePingMs: 0,
+    isRunning: false,
+    duration: 30,
+    tag: '',
+    currentLang: 'ar',
+    isDark: true,
+    wakeLock: null,
+    netInfo: { type: null, isp: null, location: null, ip: null },
+    score: 0,
+    results: {
+        ping: 0, jitter: 0, bufferbloat: 0, download: 0,
+        stability: 0, noise: 0, jitterPct: 0, mos: 0, score: 0,
+        timestamp: null
+    }
+};
+
+// ---------- TRANSLATIONS ----------
+const T = {
+ar: {
+    pageTitle:"Techovia اختبار السرعة", brandTag:"اختبار السرعة",
+    language:"اللغة", toggleTheme:"تبديل الثيم", settings:"الإعدادات",
+    ready:"جاهز للفحص", conn:"جاري الاتصال...", downing:"قياس السرعة", done:"اكتمل الفحص", err:"حدث خطأ",
+    btnStart:"بدء الاختبار", running:"جاري القياس...",
+    qNone:"غير متاح", qGood:"اتصال ممتاز", qAvg:"اتصال متوسط", qBad:"اتصال ضعيف",
+    time1gb:"زمن تحميل 1 جيجابايت:", customSize:"حجم مخصص:", customTime:"الزمن المتوقع:",
+    calcTitle:"حاسبة زمن التحميل",
+    graphTitle:"مخطط السرعة اللحظي", graphEmpty:"ابدأ الاختبار لعرض المخطط", warmup:"تسخين",
+    tabOverview:"نظرة عامة", tabDetails:"التفاصيل", tabTrends:"الاتجاهات", tabHistory:"السجل",
+    qsDownload:"تحميل", qsPing:"استجابة", qsJitter:"تقلب", qsMos:"MOS",
+    stab:"الاستقرار", noise:"التشويش", bloat:"Bufferbloat", jitterPct:"تذبذب السرعة",
+    advMetrics:"مقاييس متقدمة", usageQuality:"تقييم جودة الاستخدام",
+    gaming:"أداء الألعاب التنافسية", stream:"جودة بث الفيديو",
+    videoSpeed:"سرعة تشغيل الفيديو", videoRes:"دقة الفيديو المناسبة", calls:"مكالمات الفيديو",
+    netInfo:"معلومات الشبكة", netType:"نوع الاتصال", netISP:"مزود الخدمة",
+    netLocation:"الموقع", netIP:"عنوان IP",
+    historyTitle:"آخر الاختبارات", noHistory:"لا يوجد سجل بعد", clearAll:"مسح الكل",
+    share:"مشاركة", image:"صورة", copy:"نسخ", export:"JSON",
+    durationLabel:"مدة اختبار التنزيل",
+    dur10:"10 ثوان", dur15:"15 ثانية", dur30:"30 ثانية", dur60:"60 ثانية",
+    devTools:"أدوات المطوّر", openDev:"فتح سجل المطوّر",
+    apiLabel:"واجهة برمجة Mini API", viewApi:"عرض مستندات API",
+    tagPlaceholder:"أضف وسماً (مثال: واي فاي المنزل)",
+    devTitle:"سجل المطوّر", apiTitle:"Techovia Mini API",
+    st4k:"ممتاز لـ 4K", stHd:"جيد جداً لـ 1080p", stSd:"متوسط لـ 720p", stBad:"ضعيف (SD)",
+    gPro:"احترافي (تأخير منخفض)", gStab:"مستقر (جيد)", gLag:"غير مستقر (Lag)",
+    cExcel:"ممتاز (بدون تقطيع)", cGood:"جيد", cBad:"ضعيف للاتصال المرئي",
+    confirmClear:"هل تريد مسح كل السجل؟", noReport:"لا يوجد تقرير بعد",
+    copied:"تم النسخ", copyFailed:"تعذّر النسخ",
+    imgCreating:"جاري إنشاء الصورة...", imgFailed:"فشل إنشاء الصورة", imgSaved:"تم تنزيل الصورة",
+    testFailed:"فشل الاختبار", noTag:"بدون وسم",
+    nt2gSlow:"2G بطيء", nt2g:"2G", nt3g:"3G", nt4g:"4G", ntUnknown:"غير معروف", ntUnsupported:"غير مدعوم",
+    netNotAvailable:"غير متاح",
+    scoreTitle:"درجة الاتصال", scoreBadge:"/100", scoreOverall:"التقييم العام",
+    scoreNoData:"--", scoreDescEmpty:"أجرِ اختباراً لعرض التقييم",
+    scoreExcellent:"ممتاز جداً", scoreGood:"جيد", scoreFair:"متوسط", scorePoor:"ضعيف",
+    scoreDescExcellent:"اتصال مثالي لكل الاستخدامات", scoreDescGood:"اتصال جيد لمعظم المهام",
+    scoreDescFair:"اتصال متوسط — قد يواجه بطئاً", scoreDescPoor:"اتصال ضعيف — يُنصح بالفحص",
+    readinessStreaming:"جهوزية البث", readinessGaming:"جهوزية الألعاب",
+    readinessCalls:"جهوزية المكالمات", readinessDownload:"جهوزية التنزيل",
+    identityTitle:"بطاقة الاتصال", idSpeed:"السرعة", idGrade:"التقدير",
+    trendsTitle:"تطور السرعة", trendsUnit:"MB/s",
+    trendToday:"اليوم", trend7:"7 أيام", trend30:"30 يوم", trendAll:"الكل",
+    trendNoData:"لا يوجد بيانات كافية", trendAvg:"المتوسط", trendBest:"الأفضل", trendCount:"الاختبارات"
+},
+en: {
+    pageTitle:"Techovia Speed Test", brandTag:"Speed Test",
+    language:"Language", toggleTheme:"Toggle theme", settings:"Settings",
+    ready:"Ready to test", conn:"Connecting...", downing:"Testing", done:"Test completed", err:"Error",
+    btnStart:"Start Test", running:"Testing...",
+    qNone:"Not available", qGood:"Excellent connection", qAvg:"Average connection", qBad:"Poor connection",
+    time1gb:"1GB download time:", customSize:"Custom size:", customTime:"Estimated time:",
+    calcTitle:"Download time calculator",
+    graphTitle:"Live speed graph", graphEmpty:"Start the test to see the graph", warmup:"Warm-up",
+    tabOverview:"Overview", tabDetails:"Details", tabTrends:"Trends", tabHistory:"History",
+    qsDownload:"Download", qsPing:"Ping", qsJitter:"Jitter", qsMos:"MOS",
+    stab:"Stability", noise:"Noise", bloat:"Bufferbloat", jitterPct:"Speed jitter",
+    advMetrics:"Advanced metrics", usageQuality:"Usage quality score",
+    gaming:"Competitive gaming", stream:"Video streaming",
+    videoSpeed:"Video playback speed", videoRes:"Suitable video resolution", calls:"Video calls",
+    netInfo:"Network info", netType:"Connection type", netISP:"ISP",
+    netLocation:"Location", netIP:"IP address",
+    historyTitle:"Recent tests", noHistory:"No history yet", clearAll:"Clear all",
+    share:"Share", image:"Image", copy:"Copy", export:"JSON",
+    durationLabel:"Download test duration",
+    dur10:"10s", dur15:"15s", dur30:"30s", dur60:"60s",
+    devTools:"Developer tools", openDev:"Open developer log",
+    apiLabel:"Mini API", viewApi:"View API docs",
+    tagPlaceholder:"Add a tag (e.g. Home Wi-Fi)",
+    devTitle:"Developer console", apiTitle:"Techovia Mini API",
+    st4k:"4K ready", stHd:"1080p HD ready", stSd:"720p SD", stBad:"Poor (SD)",
+    gPro:"Pro (low ping)", gStab:"Stable", gLag:"Unstable (lag)",
+    cExcel:"Excellent (clear)", cGood:"Good", cBad:"Poor for video calls",
+    confirmClear:"Clear all history?", noReport:"No report yet",
+    copied:"Copied", copyFailed:"Copy failed",
+    imgCreating:"Generating image...", imgFailed:"Image generation failed", imgSaved:"Image downloaded",
+    testFailed:"Test failed", noTag:"No tag",
+    nt2gSlow:"Slow 2G", nt2g:"2G", nt3g:"3G", nt4g:"4G", ntUnknown:"Unknown", ntUnsupported:"Unsupported",
+    netNotAvailable:"Not available",
+    scoreTitle:"Connection score", scoreBadge:"/100", scoreOverall:"Overall rating",
+    scoreNoData:"--", scoreDescEmpty:"Run a test to see your score",
+    scoreExcellent:"Excellent", scoreGood:"Good", scoreFair:"Fair", scorePoor:"Poor",
+    scoreDescExcellent:"Ideal for all uses", scoreDescGood:"Good for most tasks",
+    scoreDescFair:"Average — may experience slowdowns", scoreDescPoor:"Weak — consider troubleshooting",
+    readinessStreaming:"Streaming readiness", readinessGaming:"Gaming readiness",
+    readinessCalls:"Calls readiness", readinessDownload:"Download readiness",
+    identityTitle:"Connection card", idSpeed:"Speed", idGrade:"Grade",
+    trendsTitle:"Speed trend", trendsUnit:"MB/s",
+    trendToday:"Today", trend7:"7 days", trend30:"30 days", trendAll:"All",
+    trendNoData:"Not enough data", trendAvg:"Average", trendBest:"Best", trendCount:"Tests"
+},
+fr: {
+    pageTitle:"Techovia Test de vitesse", brandTag:"Test de vitesse",
+    language:"Langue", toggleTheme:"Thème", settings:"Paramètres",
+    ready:"Prêt", conn:"Connexion...", downing:"Test", done:"Terminé", err:"Erreur",
+    btnStart:"Démarrer", running:"Test en cours...",
+    qNone:"Indisponible", qGood:"Excellente connexion", qAvg:"Connexion moyenne", qBad:"Connexion faible",
+    time1gb:"Temps pour 1 Go:", customSize:"Taille:", customTime:"Temps estimé:",
+    calcTitle:"Calculateur de temps",
+    graphTitle:"Graphique en direct", graphEmpty:"Démarrez le test", warmup:"Échauffement",
+    tabOverview:"Aperçu", tabDetails:"Détails", tabTrends:"Tendances", tabHistory:"Historique",
+    qsDownload:"Téléchargement", qsPing:"Latence", qsJitter:"Gigue", qsMos:"MOS",
+    stab:"Stabilité", noise:"Bruit", bloat:"Bufferbloat", jitterPct:"Variation",
+    advMetrics:"Métriques avancées", usageQuality:"Qualité d'usage",
+    gaming:"Jeux", stream:"Streaming",
+    videoSpeed:"Vitesse vidéo", videoRes:"Résolution vidéo", calls:"Appels vidéo",
+    netInfo:"Infos réseau", netType:"Type de connexion", netISP:"FAI",
+    netLocation:"Emplacement", netIP:"Adresse IP",
+    historyTitle:"Tests récents", noHistory:"Aucun historique", clearAll:"Tout effacer",
+    share:"Partager", image:"Image", copy:"Copier", export:"JSON",
+    durationLabel:"Durée du test",
+    dur10:"10s", dur15:"15s", dur30:"30s", dur60:"60s",
+    devTools:"Outils dev", openDev:"Ouvrir le journal",
+    apiLabel:"Mini API", viewApi:"Voir la doc API",
+    tagPlaceholder:"Ajouter un tag", devTitle:"Console développeur", apiTitle:"Techovia Mini API",
+    st4k:"Prêt 4K", stHd:"HD 1080p", stSd:"SD 720p", stBad:"Faible (SD)",
+    gPro:"Pro (ping bas)", gStab:"Stable", gLag:"Instable",
+    cExcel:"Excellent", cGood:"Bon", cBad:"Faible",
+    confirmClear:"Effacer tout l'historique ?", noReport:"Aucun rapport",
+    copied:"Copié", copyFailed:"Échec",
+    imgCreating:"Création de l'image...", imgFailed:"Échec", imgSaved:"Image enregistrée",
+    testFailed:"Test échoué", noTag:"Sans tag",
+    nt2gSlow:"2G lent", nt2g:"2G", nt3g:"3G", nt4g:"4G", ntUnknown:"Inconnu", ntUnsupported:"Non supporté",
+    netNotAvailable:"Indisponible",
+    scoreTitle:"Score de connexion", scoreBadge:"/100", scoreOverall:"Note globale",
+    scoreNoData:"--", scoreDescEmpty:"Lancez un test",
+    scoreExcellent:"Excellent", scoreGood:"Bon", scoreFair:"Moyen", scorePoor:"Faible",
+    scoreDescExcellent:"Idéal pour tous les usages", scoreDescGood:"Bon pour la plupart",
+    scoreDescFair:"Moyen — peut ralentir", scoreDescPoor:"Faible — dépannage conseillé",
+    readinessStreaming:"Streaming", readinessGaming:"Jeux",
+    readinessCalls:"Appels", readinessDownload:"Téléchargement",
+    identityTitle:"Carte de connexion", idSpeed:"Vitesse", idGrade:"Note",
+    trendsTitle:"Tendance de vitesse", trendsUnit:"MB/s",
+    trendToday:"Aujourd'hui", trend7:"7 jours", trend30:"30 jours", trendAll:"Tout",
+    trendNoData:"Données insuffisantes", trendAvg:"Moyenne", trendBest:"Meilleur", trendCount:"Tests"
+},
+de: {
+    pageTitle:"Techovia Geschwindigkeitstest", brandTag:"Speed Test",
+    language:"Sprache", toggleTheme:"Theme", settings:"Einstellungen",
+    ready:"Bereit", conn:"Verbinde...", downing:"Test", done:"Fertig", err:"Fehler",
+    btnStart:"Test starten", running:"Teste...",
+    qNone:"N/V", qGood:"Ausgezeichnet", qAvg:"Durchschnitt", qBad:"Schlecht",
+    time1gb:"1GB Downloadzeit:", customSize:"Größe:", customTime:"Geschätzt:",
+    calcTitle:"Downloadzeit-Rechner",
+    graphTitle:"Live-Geschwindigkeit", graphEmpty:"Starten Sie den Test", warmup:"Aufwärmen",
+    tabOverview:"Übersicht", tabDetails:"Details", tabTrends:"Trends", tabHistory:"Verlauf",
+    qsDownload:"Download", qsPing:"Ping", qsJitter:"Jitter", qsMos:"MOS",
+    stab:"Stabilität", noise:"Rauschen", bloat:"Bufferbloat", jitterPct:"Schwankung",
+    advMetrics:"Erweiterte Werte", usageQuality:"Nutzungsqualität",
+    gaming:"Gaming", stream:"Streaming",
+    videoSpeed:"Video-Geschw.", videoRes:"Videoauflösung", calls:"Videoanrufe",
+    netInfo:"Netzwerkinfo", netType:"Verbindungstyp", netISP:"ISP",
+    netLocation:"Standort", netIP:"IP-Adresse",
+    historyTitle:"Letzte Tests", noHistory:"Kein Verlauf", clearAll:"Alle löschen",
+    share:"Teilen", image:"Bild", copy:"Kopieren", export:"JSON",
+    durationLabel:"Testdauer",
+    dur10:"10s", dur15:"15s", dur30:"30s", dur60:"60s",
+    devTools:"Entwickler", openDev:"Log öffnen",
+    apiLabel:"Mini API", viewApi:"API-Doku",
+    tagPlaceholder:"Tag hinzufügen", devTitle:"Entwickler-Konsole", apiTitle:"Techovia Mini API",
+    st4k:"4K bereit", stHd:"1080p HD", stSd:"720p SD", stBad:"Schwach (SD)",
+    gPro:"Pro", gStab:"Stabil", gLag:"Instabil",
+    cExcel:"Ausgezeichnet", cGood:"Gut", cBad:"Schwach",
+    confirmClear:"Verlauf löschen?", noReport:"Kein Bericht",
+    copied:"Kopiert", copyFailed:"Fehler",
+    imgCreating:"Bild wird erstellt...", imgFailed:"Fehler", imgSaved:"Bild gespeichert",
+    testFailed:"Test fehlgeschlagen", noTag:"Ohne Tag",
+    nt2gSlow:"Langsames 2G", nt2g:"2G", nt3g:"3G", nt4g:"4G", ntUnknown:"Unbekannt", ntUnsupported:"Nicht unterstützt",
+    netNotAvailable:"N/V",
+    scoreTitle:"Verbindungswert", scoreBadge:"/100", scoreOverall:"Gesamtbewertung",
+    scoreNoData:"--", scoreDescEmpty:"Starten Sie einen Test",
+    scoreExcellent:"Ausgezeichnet", scoreGood:"Gut", scoreFair:"Mittel", scorePoor:"Schwach",
+    scoreDescExcellent:"Ideal für alle Nutzungen", scoreDescGood:"Gut für die meisten Aufgaben",
+    scoreDescFair:"Mittel — evtl. langsam", scoreDescPoor:"Schwach — Problembehebung empfohlen",
+    readinessStreaming:"Streaming", readinessGaming:"Gaming",
+    readinessCalls:"Anrufe", readinessDownload:"Download",
+    identityTitle:"Verbindungskarte", idSpeed:"Geschw.", idGrade:"Note",
+    trendsTitle:"Geschwindigkeitstrend", trendsUnit:"MB/s",
+    trendToday:"Heute", trend7:"7 Tage", trend30:"30 Tage", trendAll:"Alle",
+    trendNoData:"Nicht genug Daten", trendAvg:"Durchschnitt", trendBest:"Beste", trendCount:"Tests"
+},
+es: {
+    pageTitle:"Techovia Test de Velocidad", brandTag:"Test de Velocidad",
+    language:"Idioma", toggleTheme:"Tema", settings:"Ajustes",
+    ready:"Listo", conn:"Conectando...", downing:"Probando", done:"Completado", err:"Error",
+    btnStart:"Iniciar", running:"Probando...",
+    qNone:"N/D", qGood:"Excelente", qAvg:"Media", qBad:"Pobre",
+    time1gb:"Tiempo para 1GB:", customSize:"Tamaño:", customTime:"Tiempo estimado:",
+    calcTitle:"Calculadora de tiempo",
+    graphTitle:"Gráfico en vivo", graphEmpty:"Inicia el test", warmup:"Calentando",
+    tabOverview:"Resumen", tabDetails:"Detalles", tabTrends:"Tendencias", tabHistory:"Historial",
+    qsDownload:"Descarga", qsPing:"Ping", qsJitter:"Jitter", qsMos:"MOS",
+    stab:"Estabilidad", noise:"Ruido", bloat:"Bufferbloat", jitterPct:"Variación",
+    advMetrics:"Métricas avanzadas", usageQuality:"Calidad de uso",
+    gaming:"Juegos", stream:"Streaming",
+    videoSpeed:"Velocidad video", videoRes:"Resolución", calls:"Videollamadas",
+    netInfo:"Info de red", netType:"Tipo de conexión", netISP:"ISP",
+    netLocation:"Ubicación", netIP:"Dirección IP",
+    historyTitle:"Tests recientes", noHistory:"Sin historial", clearAll:"Borrar todo",
+    share:"Compartir", image:"Imagen", copy:"Copiar", export:"JSON",
+    durationLabel:"Duración",
+    dur10:"10s", dur15:"15s", dur30:"30s", dur60:"60s",
+    devTools:"Herramientas", openDev:"Abrir log",
+    apiLabel:"Mini API", viewApi:"Ver API",
+    tagPlaceholder:"Etiqueta", devTitle:"Consola dev", apiTitle:"Techovia Mini API",
+    st4k:"Listo 4K", stHd:"1080p HD", stSd:"720p SD", stBad:"Pobre",
+    gPro:"Pro", gStab:"Estable", gLag:"Inestable",
+    cExcel:"Excelente", cGood:"Bueno", cBad:"Pobre",
+    confirmClear:"¿Borrar historial?", noReport:"Sin reporte",
+    copied:"Copiado", copyFailed:"Error",
+    imgCreating:"Generando imagen...", imgFailed:"Error", imgSaved:"Imagen descargada",
+    testFailed:"Test fallido", noTag:"Sin etiqueta",
+    nt2gSlow:"2G lento", nt2g:"2G", nt3g:"3G", nt4g:"4G", ntUnknown:"Desconocido", ntUnsupported:"No soportado",
+    netNotAvailable:"N/D",
+    scoreTitle:"Puntuación", scoreBadge:"/100", scoreOverall:"Evaluación general",
+    scoreNoData:"--", scoreDescEmpty:"Ejecuta un test",
+    scoreExcellent:"Excelente", scoreGood:"Bueno", scoreFair:"Regular", scorePoor:"Pobre",
+    scoreDescExcellent:"Ideal para todo uso", scoreDescGood:"Bueno para la mayoría",
+    scoreDescFair:"Regular — puede ralentizar", scoreDescPoor:"Pobre — revisa tu red",
+    readinessStreaming:"Streaming", readinessGaming:"Juegos",
+    readinessCalls:"Llamadas", readinessDownload:"Descarga",
+    identityTitle:"Tarjeta de conexión", idSpeed:"Velocidad", idGrade:"Nota",
+    trendsTitle:"Tendencia de velocidad", trendsUnit:"MB/s",
+    trendToday:"Hoy", trend7:"7 días", trend30:"30 días", trendAll:"Todo",
+    trendNoData:"Datos insuficientes", trendAvg:"Media", trendBest:"Mejor", trendCount:"Tests"
+},
+tr: {
+    pageTitle:"Techovia Hız Testi", brandTag:"Hız Testi",
+    language:"Dil", toggleTheme:"Tema", settings:"Ayarlar",
+    ready:"Hazır", conn:"Bağlanıyor...", downing:"Test", done:"Tamamlandı", err:"Hata",
+    btnStart:"Başlat", running:"Test ediliyor...",
+    qNone:"Yok", qGood:"Mükemmel", qAvg:"Orta", qBad:"Zayıf",
+    time1gb:"1GB indirme:", customSize:"Boyut:", customTime:"Tahmini süre:",
+    calcTitle:"İndirme süresi hesaplayıcı",
+    graphTitle:"Canlı hız grafiği", graphEmpty:"Testi başlatın", warmup:"Isınma",
+    tabOverview:"Genel", tabDetails:"Detaylar", tabTrends:"Trendler", tabHistory:"Geçmiş",
+    qsDownload:"İndirme", qsPing:"Ping", qsJitter:"Jitter", qsMos:"MOS",
+    stab:"Kararlılık", noise:"Gürültü", bloat:"Bufferbloat", jitterPct:"Dalgalanma",
+    advMetrics:"Gelişmiş metrikler", usageQuality:"Kullanım kalitesi",
+    gaming:"Oyun", stream:"Yayın",
+    videoSpeed:"Video hızı", videoRes:"Çözünürlük", calls:"Görüntülü arama",
+    netInfo:"Ağ bilgisi", netType:"Bağlantı türü", netISP:"ISS",
+    netLocation:"Konum", netIP:"IP",
+    historyTitle:"Son testler", noHistory:"Geçmiş yok", clearAll:"Tümünü sil",
+    share:"Paylaş", image:"Görsel", copy:"Kopyala", export:"JSON",
+    durationLabel:"Test süresi",
+    dur10:"10sn", dur15:"15sn", dur30:"30sn", dur60:"60sn",
+    devTools:"Geliştirici", openDev:"Logu aç",
+    apiLabel:"Mini API", viewApi:"API dokümanı",
+    tagPlaceholder:"Etiket", devTitle:"Geliştirici konsolu", apiTitle:"Techovia Mini API",
+    st4k:"4K hazır", stHd:"1080p HD", stSd:"720p SD", stBad:"Zayıf",
+    gPro:"Pro", gStab:"Kararlı", gLag:"Kararsız",
+    cExcel:"Mükemmel", cGood:"İyi", cBad:"Zayıf",
+    confirmClear:"Geçmiş silinsin mi?", noReport:"Rapor yok",
+    copied:"Kopyalandı", copyFailed:"Hata",
+    imgCreating:"Görsel oluşturuluyor...", imgFailed:"Hata", imgSaved:"Görsel indirildi",
+    testFailed:"Test başarısız", noTag:"Etiketsiz",
+    nt2gSlow:"Yavaş 2G", nt2g:"2G", nt3g:"3G", nt4g:"4G", ntUnknown:"Bilinmiyor", ntUnsupported:"Desteklenmiyor",
+    netNotAvailable:"Yok",
+    scoreTitle:"Bağlantı puanı", scoreBadge:"/100", scoreOverall:"Genel değerlendirme",
+    scoreNoData:"--", scoreDescEmpty:"Bir test çalıştırın",
+    scoreExcellent:"Mükemmel", scoreGood:"İyi", scoreFair:"Orta", scorePoor:"Zayıf",
+    scoreDescExcellent:"Tüm kullanımlar için ideal", scoreDescGood:"Çoğu görev için iyi",
+    scoreDescFair:"Orta — yavaşlama olabilir", scoreDescPoor:"Zayıf — kontrol edin",
+    readinessStreaming:"Yayın", readinessGaming:"Oyun",
+    readinessCalls:"Aramalar", readinessDownload:"İndirme",
+    identityTitle:"Bağlantı kartı", idSpeed:"Hız", idGrade:"Not",
+    trendsTitle:"Hız trendi", trendsUnit:"MB/s",
+    trendToday:"Bugün", trend7:"7 gün", trend30:"30 gün", trendAll:"Tümü",
+    trendNoData:"Yeterli veri yok", trendAvg:"Ortalama", trendBest:"En iyi", trendCount:"Testler"
+},
+nl: {
+    pageTitle:"Techovia Snelheidstest", brandTag:"Snelheidstest",
+    language:"Taal", toggleTheme:"Thema", settings:"Instellingen",
+    ready:"Klaar", conn:"Verbinden...", downing:"Testen", done:"Voltooid", err:"Fout",
+    btnStart:"Start test", running:"Testen...",
+    qNone:"N/B", qGood:"Uitstekend", qAvg:"Gemiddeld", qBad:"Slecht",
+    time1gb:"Tijd voor 1GB:", customSize:"Grootte:", customTime:"Geschatte tijd:",
+    calcTitle:"Downloadtijd-calculator",
+    graphTitle:"Live grafiek", graphEmpty:"Start de test", warmup:"Opwarmen",
+    tabOverview:"Overzicht", tabDetails:"Details", tabTrends:"Trends", tabHistory:"Geschiedenis",
+    qsDownload:"Download", qsPing:"Ping", qsJitter:"Jitter", qsMos:"MOS",
+    stab:"Stabiliteit", noise:"Ruis", bloat:"Bufferbloat", jitterPct:"Schommeling",
+    advMetrics:"Geavanceerd", usageQuality:"Gebruikskwaliteit",
+    gaming:"Gaming", stream:"Streaming",
+    videoSpeed:"Videosnelheid", videoRes:"Resolutie", calls:"Videobellen",
+    netInfo:"Netwerkinfo", netType:"Type", netISP:"ISP",
+    netLocation:"Locatie", netIP:"IP-adres",
+    historyTitle:"Recente tests", noHistory:"Geen geschiedenis", clearAll:"Alles wissen",
+    share:"Delen", image:"Afbeelding", copy:"Kopiëren", export:"JSON",
+    durationLabel:"Testduur",
+    dur10:"10s", dur15:"15s", dur30:"30s", dur60:"60s",
+    devTools:"Ontwikkelaar", openDev:"Log openen",
+    apiLabel:"Mini API", viewApi:"API-docs",
+    tagPlaceholder:"Tag", devTitle:"Ontwikkelaarsconsole", apiTitle:"Techovia Mini API",
+    st4k:"4K gereed", stHd:"1080p HD", stSd:"720p SD", stBad:"Slecht",
+    gPro:"Pro", gStab:"Stabiel", gLag:"Onstabiel",
+    cExcel:"Uitstekend", cGood:"Goed", cBad:"Slecht",
+    confirmClear:"Geschiedenis wissen?", noReport:"Geen rapport",
+    copied:"Gekopieerd", copyFailed:"Fout",
+    imgCreating:"Afbeelding maken...", imgFailed:"Fout", imgSaved:"Afbeelding opgeslagen",
+    testFailed:"Test mislukt", noTag:"Geen tag",
+    nt2gSlow:"Langzaam 2G", nt2g:"2G", nt3g:"3G", nt4g:"4G", ntUnknown:"Onbekend", ntUnsupported:"Niet ondersteund",
+    netNotAvailable:"N/B",
+    scoreTitle:"Verbindingsscore", scoreBadge:"/100", scoreOverall:"Totaalscore",
+    scoreNoData:"--", scoreDescEmpty:"Start een test",
+    scoreExcellent:"Uitstekend", scoreGood:"Goed", scoreFair:"Gemiddeld", scorePoor:"Slecht",
+    scoreDescExcellent:"Ideaal voor alle gebruik", scoreDescGood:"Goed voor meeste taken",
+    scoreDescFair:"Gemiddeld — kan traag zijn", scoreDescPoor:"Slecht — controleer netwerk",
+    readinessStreaming:"Streaming", readinessGaming:"Gaming",
+    readinessCalls:"Bellen", readinessDownload:"Download",
+    identityTitle:"Verbindingskaart", idSpeed:"Snelheid", idGrade:"Cijfer",
+    trendsTitle:"Snelheidstrend", trendsUnit:"MB/s",
+    trendToday:"Vandaag", trend7:"7 dagen", trend30:"30 dagen", trendAll:"Alle",
+    trendNoData:"Onvoldoende data", trendAvg:"Gemiddelde", trendBest:"Beste", trendCount:"Tests"
+}
+};
+
+// ---------- HELPERS ----------
+const $ = id => document.getElementById(id);
+const t = k => (T[state.currentLang] || T.en)[k] || T.en[k] || k;
+const getStored = k => { try { return localStorage.getItem(k); } catch(e) { return null; } };
+const setStored = (k, v) => { try { localStorage.setItem(k, v); } catch(e) {} };
+
+function formatTime(s) {
+    if (!isFinite(s) || s <= 0) return '--:--';
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.floor(s%60);
+    if (h > 0) return h + 'h ' + m + 'm ' + sec + 's';
+    if (m > 0) return m + 'm ' + sec + 's';
+    return sec + 's';
+}
+function formatSpeed(mbs) { return mbs >= 1 ? mbs.toFixed(2) + ' MB/s' : (mbs*1024).toFixed(0) + ' KB/s'; }
+function noCacheUrl(base, params) {
+    const u = new URL(base);
+    if (params) Object.keys(params).forEach(k => u.searchParams.append(k, params[k]));
+    u.searchParams.append('_t', Date.now() + Math.random());
+    return u.toString();
+}
+function flash(id) {
+    const el = $(id); if (!el) return;
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+}
+let toastTimer;
+function toast(msg, type) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = 'toast' + (type ? ' ' + type : ''); }, 2400);
+}
+function devLog(data) {
+    const p = $('devPanel');
+    const ts = new Date().toLocaleTimeString();
+    p.textContent = '[' + ts + '] ' + JSON.stringify(data, null, 2) + '\n\n' + p.textContent;
+}
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+function calcMOS(ping, jitter) {
+    if (!ping && !jitter) return 0;
+    const mos = 4.5 - (ping * 0.028) - (jitter * 0.045);
+    return Math.max(1, Math.min(4.5, mos));
+}
+
+// ---------- NEW: score + readiness ----------
+function calcConnectionScore(d, ping, jitter, bloat, stability) {
+    if (!d) return 0;
+    const mbps = d * 8;
+    const speedScore = Math.min(100, (mbps / 50) * 100);
+    const pingScore = Math.max(0, 100 - ping * 1.2);
+    const jitterScore = Math.max(0, 100 - jitter * 3);
+    const stabilityScore = stability || 100;
+    const bloatScore = Math.max(0, 100 - bloat * 2);
+    return Math.round(
+        speedScore * 0.40 +
+        pingScore * 0.25 +
+        jitterScore * 0.15 +
+        stabilityScore * 0.15 +
+        bloatScore * 0.05
+    );
+}
+function calcReadiness(d, ping, jitter, bloat) {
+    const mbps = d * 8;
+    const pingOk = ping < 30 ? 100 : Math.max(0, 100 - (ping - 30) * 1.5);
+    const jitterOk = jitter < 5 ? 100 : Math.max(0, 100 - (jitter - 5) * 4);
+    const bloatOk = bloat < 30 ? 100 : Math.max(0, 100 - (bloat - 30) * 2);
+    return {
+        streaming: Math.min(100, Math.round((mbps / 25) * 100)),
+        gaming: Math.round(pingOk * 0.4 + jitterOk * 0.4 + bloatOk * 0.2),
+        calls: Math.round(Math.min(100, (mbps / 5) * 100) * 0.6 + pingOk * 0.4),
+        download: Math.min(100, Math.round((mbps / 50) * 100))
+    };
+}
+function gradeFromScore(s) {
+    if (s >= 85) return 'A+';
+    if (s >= 75) return 'A';
+    if (s >= 65) return 'B';
+    if (s >= 55) return 'C';
+    if (s >= 45) return 'D';
+    return 'E';
+}
+function levelFromScore(s) {
+    if (s >= 75) return 'good';
+    if (s >= 50) return 'avg';
+    return 'bad';
+}
+function updateScoreUI(score, d, ping, jitter, bloat, stability) {
+    const circ = 251.3;
+    const progress = $('scoreProgress');
+    if (progress) progress.style.strokeDashoffset = circ * (1 - score / 100);
+
+    $('scoreNumber').textContent = score || '--';
+
+    let gradeKey = 'scoreNoData';
+    let gradeDescKey = 'scoreDescEmpty';
+    if (score >= 85) { gradeKey = 'scoreExcellent'; gradeDescKey = 'scoreDescExcellent'; }
+    else if (score >= 70) { gradeKey = 'scoreGood'; gradeDescKey = 'scoreDescGood'; }
+    else if (score >= 50) { gradeKey = 'scoreFair'; gradeDescKey = 'scoreDescFair'; }
+    else if (score > 0) { gradeKey = 'scorePoor'; gradeDescKey = 'scoreDescPoor'; }
+
+    $('scoreGrade').textContent = score ? t(gradeKey) : '--';
+    $('scoreDesc').textContent = t(gradeDescKey);
+
+    const rd = calcReadiness(d, ping, jitter, bloat);
+    setReadiness('rdStreaming', rd.streaming);
+    setReadiness('rdGaming', rd.gaming);
+    setReadiness('rdCalls', rd.calls);
+    setReadiness('rdDownload', rd.download);
+}
+function setReadiness(prefix, val) {
+    const pct = $('${prefix}Pct'); // placeholder, replaced below
+}
+function setReadinessReal(pctId, fillId, val) {
+    const pctEl = $(pctId);
+    const fillEl = $(fillId);
+    if (pctEl) pctEl.textContent = val + '%';
+    if (fillEl) {
+        fillEl.style.width = Math.max(2, val) + '%';
+        fillEl.setAttribute('data-level', levelFromScore(val));
+    }
+}
+function updateReadinessUI(d, ping, jitter, bloat) {
+    const rd = calcReadiness(d, ping, jitter, bloat);
+    setReadinessReal('rdStreamingPct', 'rdStreamingFill', rd.streaming);
+    setReadinessReal('rdGamingPct', 'rdGamingFill', rd.gaming);
+    setReadinessReal('rdCallsPct', 'rdCallsFill', rd.calls);
+    setReadinessReal('rdDownloadPct', 'rdDownloadFill', rd.download);
+}
+
+// ---------- HISTORY ----------
+function getHistory() {
+    try { return JSON.parse(getStored(CONFIG.HISTORY_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveHistory(h) { setStored(CONFIG.HISTORY_KEY, JSON.stringify(h.slice(0, CONFIG.HISTORY_MAX))); }
+function addHistory(entry) {
+    const h = getHistory();
+    h.unshift(entry);
+    saveHistory(h);
+    renderHistory();
+    renderTrends();
+}
+function deleteHistory(id) {
+    const h = getHistory().filter(e => e.id !== id);
+    saveHistory(h);
+    renderHistory();
+    renderTrends();
+}
+function clearHistory() {
+    if (!confirm(t('confirmClear'))) return;
+    try { localStorage.removeItem(CONFIG.HISTORY_KEY); } catch(e) {}
+    renderHistory();
+    renderTrends();
+}
+function renderHistory() {
+    const list = $('historyList');
+    if (!list) return;
+    const h = getHistory();
+    if (!h.length) {
+        list.innerHTML = '<div class="history-empty">' + t('noHistory') + '</div>';
+        return;
+    }
+    const loc = state.currentLang === 'ar' ? 'ar' : 'en';
+    list.innerHTML = h.map(e => {
+        const d = new Date(e.timestamp);
+        const when = d.toLocaleDateString(loc, { month:'short', day:'numeric' }) + ' ' +
+                     d.toLocaleTimeString(loc, { hour:'2-digit', minute:'2-digit' });
+        const score = e.score || 0;
+        const grade = score ? gradeFromScore(score) : '--';
+        const level = levelFromScore(score);
+        const tagHtml = e.tag
+            ? '<span class="history-tag">' + escapeHtml(e.tag) + '</span>'
+            : '<span class="history-tag empty">' + t('noTag') + '</span>';
+        return '<div class="history-item">' +
+            '<button class="history-item-del" data-del="' + e.id + '" aria-label="Delete">×</button>' +
+            '<div class="history-avatar" data-grade="' + level + '">' + grade + '</div>' +
+            '<div class="history-main">' +
+                tagHtml +
+                '<div class="history-meta">' +
+                    '<span class="history-meta-item">⏱ <b>' + e.ping + 'ms</b></span>' +
+                    '<span class="history-meta-item">〰 <b>' + e.jitter + 'ms</b></span>' +
+                    '<span class="history-meta-item">🎚 <b>' + (e.mos || '-') + '</b></span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="history-right">' +
+                '<span class="history-speed">' + (e.download >= 1 ? e.download + ' MB/s' : (e.download*1024).toFixed(0) + ' KB/s') + '</span>' +
+                '<span class="history-time">' + when + '</span>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+    list.querySelectorAll('[data-del]').forEach(b => {
+        b.addEventListener('click', ev => {
+            ev.stopPropagation();
+            deleteHistory(Number(b.getAttribute('data-del')));
+        });
+    });
+}
+
+// ---------- TRENDS ----------
+let trendsFilterDays = 1;
+let trendsPending = false;
+
+function getTrendData() {
+    const h = getHistory();
+    const now = Date.now();
+    return h
+        .filter(e => {
+            if (trendsFilterDays === 0) return true;
+            const age = (now - new Date(e.timestamp).getTime()) / (1000 * 60 * 60 * 24);
+            return age <= trendsFilterDays;
+        })
+        .map(e => ({ ts: new Date(e.timestamp).getTime(), dl: e.download }))
+        .sort((a, b) => a.ts - b.ts);
+}
+
+function renderTrends() {
+    if (trendsPending) return;
+    trendsPending = true;
+    requestAnimationFrame(() => {
+        trendsPending = false;
+        _renderTrends();
+    });
+}
+
+function _renderTrends() {
+    const c = $('trendChart');
+    if (!c) return;
+    const wrap = c.parentElement;
+    const rect = wrap.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(rect.width, 1), h = Math.max(rect.height, 1);
+    if (c.width !== w * dpr || c.height !== h * dpr) { c.width = w * dpr; c.height = h * dpr; }
+    const ctx = c.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    const data = getTrendData();
+
+    // Summary stats
+    if (data.length) {
+        const avg = data.reduce((s, x) => s + x.dl, 0) / data.length;
+        const best = Math.max(...data.map(x => x.dl));
+        $('trendAvgVal').textContent = avg >= 1 ? avg.toFixed(2) : (avg*1024).toFixed(0) + 'K';
+        $('trendBestVal').textContent = best >= 1 ? best.toFixed(2) : (best*1024).toFixed(0) + 'K';
+        $('trendCountVal').textContent = data.length;
+    } else {
+        $('trendAvgVal').textContent = '-';
+        $('trendBestVal').textContent = '-';
+        $('trendCountVal').textContent = '0';
+    }
+
+    if (data.length < 1) {
+        $('trendEmpty').style.display = 'grid';
+        return;
+    }
+    $('trendEmpty').style.display = 'none';
+
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const padL = 8, padR = 42, padT = 14, padB = 22;
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
+
+    const textDim = isDark ? 'rgba(122,146,184,0.9)' : 'rgba(136,153,176,1)';
+    const gridLine = isDark ? 'rgba(77,171,255,0.07)' : 'rgba(10,26,58,0.05)';
+    const gridStrong = isDark ? 'rgba(77,171,255,0.16)' : 'rgba(10,26,58,0.10)';
+    const strokeC1 = isDark ? '#4dabff' : '#1e6fe0';
+    const strokeC2 = isDark ? '#b6e1ff' : '#4dabff';
+
+    let peak = 0;
+    for (const d of data) if (d.dl > peak) peak = d.dl;
+    const max = Math.max(peak * 1.15, 0.05);
+
+    // Y grid
+    const rows = 3;
+    ctx.font = '500 9px "Space Grotesk", system-ui, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i <= rows; i++) {
+        const y = padT + plotH * (i / rows);
+        ctx.strokeStyle = i === rows ? gridStrong : gridLine;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
+        const val = max * (1 - i / rows);
+        ctx.fillStyle = textDim;
+        const lbl = val >= 1 ? val.toFixed(val >= 10 ? 0 : 1) : (val*1024).toFixed(0);
+        ctx.fillText(lbl, w - 4, y);
+    }
+
+    // X labels
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const marks = Math.min(data.length, 4);
+    for (let i = 0; i < marks; i++) {
+        const idx = Math.floor(i * (data.length - 1) / (marks - 1 || 1));
+        const x = padL + (data.length > 1 ? (idx / (data.length - 1)) * plotW : plotW / 2);
+        const dt = new Date(data[idx].ts);
+        const lbl = dt.toLocaleDateString(state.currentLang === 'ar' ? 'ar' : 'en', { month:'short', day:'numeric' });
+        ctx.fillStyle = textDim;
+        ctx.fillText(lbl, x, padT + plotH + 4);
+    }
+
+    // Points
+    const pts = data.map((d, i) => ({
+        x: data.length > 1 ? padL + (i / (data.length - 1)) * plotW : padL + plotW / 2,
+        y: padT + plotH - Math.min((d.dl / max) * plotH, plotH)
+    }));
+
+    // Area fill
+    const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+    if (isDark) {
+        grad.addColorStop(0, 'rgba(77,171,255,0.42)');
+        grad.addColorStop(0.55, 'rgba(77,171,255,0.10)');
+        grad.addColorStop(1, 'rgba(77,171,255,0)');
+    } else {
+        grad.addColorStop(0, 'rgba(30,111,224,0.28)');
+        grad.addColorStop(0.55, 'rgba(30,111,224,0.06)');
+        grad.addColorStop(1, 'rgba(30,111,224,0)');
+    }
+
+    if (data.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, padT + plotH);
+        ctx.lineTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+            const p = pts[i-1], cc = pts[i];
+            const cx = (p.x + cc.x) / 2;
+            ctx.bezierCurveTo(cx, p.y, cx, cc.y, cc.x, cc.y);
+        }
+        ctx.lineTo(pts[pts.length-1].x, padT + plotH);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Line
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+            const p = pts[i-1], cc = pts[i];
+            const cx = (p.x + cc.x) / 2;
+            ctx.bezierCurveTo(cx, p.y, cx, cc.y, cc.x, cc.y);
+        }
+        const lineGrad = ctx.createLinearGradient(padL, 0, padL + plotW, 0);
+        lineGrad.addColorStop(0, strokeC2);
+        lineGrad.addColorStop(1, strokeC1);
+        ctx.strokeStyle = lineGrad;
+        ctx.lineWidth = 2.4;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+    }
+
+    // Points
+    pts.forEach((p, i) => {
+        const isLast = i === pts.length - 1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, isLast ? 5 : 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? 'rgba(77,171,255,0.22)' : 'rgba(30,111,224,0.18)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, isLast ? 2.6 : 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = isLast ? '#fff' : strokeC1;
+        ctx.fill();
+    });
+}
+
+// ---------- GRAPH ----------
+let graphPending = false;
+let graphHoverIdx = -1;
+
+function resizeCanvas() {
+    const c = $('graph');
+    if (!c) return null;
+    const wrap = c.parentElement;
+    const rect = wrap.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, device.isLowEnd ? 1 : 2);
+    const w = Math.max(rect.width, 1);
+    const h = Math.max(rect.height, 1);
+    if (c.width !== w * dpr || c.height !== h * dpr) {
+        c.width = w * dpr;
+        c.height = h * dpr;
+    }
+    return { ctx: c.getContext('2d'), w, h, dpr };
+}
+
+function drawGraph() {
+    if (graphPending) return;
+    graphPending = true;
+    requestAnimationFrame(() => {
+        graphPending = false;
+        _drawGraph();
+    });
+}
+
+function _drawGraph() {
+    const g = resizeCanvas();
+    if (!g) return;
+    const ctx = g.ctx, w = g.w, h = g.h;
+
+    ctx.setTransform(g.dpr, 0, 0, g.dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const padL = 6, padR = 42, padT = 14, padB = 16;
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
+
+    const textDim = isDark ? 'rgba(122,146,184,0.9)' : 'rgba(136,153,176,1)';
+    const gridLine = isDark ? 'rgba(77,171,255,0.07)' : 'rgba(10,26,58,0.05)';
+    const gridStrong = isDark ? 'rgba(77,171,255,0.16)' : 'rgba(10,26,58,0.10)';
+    const strokeC1 = isDark ? '#4dabff' : '#1e6fe0';
+    const strokeC2 = isDark ? '#b6e1ff' : '#4dabff';
+
+    let peak = 0;
+    for (let i = 0; i < state.speeds.length; i++) if (state.speeds[i] > peak) peak = state.speeds[i];
+    const effectiveMax = Math.max(state.currentMax, peak * 1.15, 0.05);
+
+    const isKbMode = effectiveMax < 1;
+    $('graphLabel').textContent = isKbMode ? 'KB/s' : 'MB/s';
+
+    const rows = 3;
+    ctx.font = '500 9px "Space Grotesk", system-ui, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i <= rows; i++) {
+        const y = padT + plotH * (i / rows);
+        ctx.strokeStyle = i === rows ? gridStrong : gridLine;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
+        const val = effectiveMax * (1 - i / rows);
+        ctx.fillStyle = textDim;
+        const lbl = val >= 1 ? val.toFixed(val >= 10 ? 0 : 1) : (val * 1024).toFixed(0);
+        ctx.fillText(lbl, w - 4, y);
+    }
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const sampleSec = CONFIG.UI_UPDATE_INTERVAL / 1000;
+    if (state.speeds.length > 1) {
+        const totalSec = state.speeds.length * sampleSec;
+        for (let i = 0; i <= 3; i++) {
+            const x = padL + plotW * (i / 3);
+            const tSec = totalSec * (i / 3);
+            ctx.fillStyle = textDim;
+            ctx.fillText(tSec.toFixed(1) + 's', x, padT + plotH + 3);
+        }
+    }
+
+    if (state.speeds.length < 2) {
+        $('graphEmpty').classList.toggle('hidden', state.speeds.length > 0);
+        return;
+    }
+    $('graphEmpty').classList.add('hidden');
+
+    const pts = state.speeds.map((s, i) => ({
+        x: padL + i * (plotW / (state.speeds.length - 1)),
+        y: padT + plotH - Math.min((s / effectiveMax) * plotH, plotH)
+    }));
+
+    // Trend (moving average)
+    const win = Math.max(3, Math.floor(state.speeds.length / 12));
+    const trend = state.speeds.map((_, i) => {
+        const a = Math.max(0, i - win), b = Math.min(state.speeds.length, i + win + 1);
+        let sum = 0;
+        for (let j = a; j < b; j++) sum += state.speeds[j];
+        return sum / (b - a);
+    });
+    const trendPts = trend.map((s, i) => ({
+        x: padL + i * (plotW / (state.speeds.length - 1)),
+        y: padT + plotH - Math.min((s / effectiveMax) * plotH, plotH)
+    }));
+
+    const buildPath = (list) => {
+        ctx.beginPath();
+        ctx.moveTo(list[0].x, list[0].y);
+        for (let i = 1; i < list.length; i++) {
+            const p = list[i-1], cc = list[i];
+            const cx = (p.x + cc.x) / 2;
+            ctx.bezierCurveTo(cx, p.y, cx, cc.y, cc.x, cc.y);
+        }
+    };
+
+    // Fill
+    const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+    if (isDark) {
+        grad.addColorStop(0, 'rgba(77,171,255,0.42)');
+        grad.addColorStop(0.55, 'rgba(77,171,255,0.10)');
+        grad.addColorStop(1, 'rgba(77,171,255,0)');
+    } else {
+        grad.addColorStop(0, 'rgba(30,111,224,0.28)');
+        grad.addColorStop(0.55, 'rgba(30,111,224,0.06)');
+        grad.addColorStop(1, 'rgba(30,111,224,0)');
+    }
+    buildPath(pts);
+    ctx.lineTo(pts[pts.length-1].x, padT + plotH);
+    ctx.lineTo(pts[0].x, padT + plotH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Trend dashed
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(trendPts[0].x, trendPts[0].y);
+    for (let i = 1; i < trendPts.length; i++) ctx.lineTo(trendPts[i].x, trendPts[i].y);
+    ctx.strokeStyle = isDark ? 'rgba(182,225,255,0.35)' : 'rgba(30,111,224,0.35)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // Main line
+    if (!device.isLowEnd) {
+        ctx.save();
+        ctx.shadowColor = strokeC1;
+        ctx.shadowBlur = isDark ? 14 : 8;
+        buildPath(pts);
+        const lineGrad = ctx.createLinearGradient(padL, 0, padL + plotW, 0);
+        lineGrad.addColorStop(0, strokeC2);
+        lineGrad.addColorStop(1, strokeC1);
+        ctx.strokeStyle = lineGrad;
+        ctx.lineWidth = 2.4;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        ctx.restore();
+    } else {
+        buildPath(pts);
+        ctx.strokeStyle = strokeC1;
+        ctx.lineWidth = 2.2;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+    }
+
+    // Endpoint
+    const last = pts[pts.length - 1];
+    ctx.beginPath(); ctx.arc(last.x, last.y, 7, 0, Math.PI*2);
+    ctx.fillStyle = isDark ? 'rgba(77,171,255,0.22)' : 'rgba(30,111,224,0.18)';
+    ctx.fill();
+    ctx.beginPath(); ctx.arc(last.x, last.y, 3.2, 0, Math.PI*2);
+    ctx.fillStyle = strokeC1; ctx.fill();
+    ctx.beginPath(); ctx.arc(last.x, last.y, 1.4, 0, Math.PI*2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+
+    // Hover
+    if (graphHoverIdx >= 0 && graphHoverIdx < pts.length) {
+        const hp = pts[graphHoverIdx];
+        ctx.save();
+        ctx.strokeStyle = isDark ? 'rgba(77,171,255,0.35)' : 'rgba(30,111,224,0.3)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(hp.x, padT); ctx.lineTo(hp.x, padT + plotH); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(hp.x, hp.y, 5, 0, Math.PI*2);
+        ctx.fillStyle = isDark ? 'rgba(77,171,255,0.35)' : 'rgba(30,111,224,0.3)';
+        ctx.fill();
+        ctx.beginPath(); ctx.arc(hp.x, hp.y, 2.5, 0, Math.PI*2);
+        ctx.fillStyle = '#fff'; ctx.fill();
+        ctx.restore();
+    }
+}
+
+function handleGraphHover(ev) {
+    if (state.speeds.length < 2) return;
+    const c = $('graph');
+    const rect = c.getBoundingClientRect();
+    const x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+    const padL = 6, padR = 42;
+    const plotW = rect.width - padL - padR;
+    const rel = Math.max(0, Math.min(1, (x - padL) / plotW));
+    graphHoverIdx = Math.round(rel * (state.speeds.length - 1));
+
+    const tip = $('graphTip');
+    const speed = state.speeds[graphHoverIdx];
+    const tSec = graphHoverIdx * (CONFIG.UI_UPDATE_INTERVAL / 1000);
+    $('ttSpeed').textContent = formatSpeed(speed);
+    $('ttTime').textContent = tSec.toFixed(1) + 's';
+    const xPx = padL + (graphHoverIdx / (state.speeds.length - 1)) * plotW;
+    tip.style.left = xPx + 'px';
+    tip.style.top = '6px';
+    tip.classList.add('show');
+    drawGraph();
+}
+function hideGraphTip() {
+    graphHoverIdx = -1;
+    $('graphTip').classList.remove('show');
+    drawGraph();
+}
+
+// ---------- GAUGE ----------
+function setGaugeProgress(pct) {
+    const arc = 424.1;
+    const el = $('gaugeProgress');
+    if (!el) return;
+    el.style.strokeDashoffset = arc * (1 - Math.max(0, Math.min(1, pct)));
+}
+
+// ---------- SPEED DISPLAY ----------
+function setSpeed(mbs) {
+    const v = $('speed'), u = $('statusUnit');
+    if (mbs >= 1) { v.textContent = mbs.toFixed(2); u.textContent = 'MB/s'; }
+    else { v.textContent = (mbs * 1024).toFixed(0); u.textContent = 'KB/s'; }
+}
+function setSpeedColor(mbs) {
+    const v = $('speed');
+    let c = 'var(--text-1)';
+    if (mbs > 25) c = 'var(--success)';
+    else if (mbs > 5) c = 'var(--primary)';
+    else if (mbs > 0) c = 'var(--warning)';
+    v.style.color = c;
+}
+function setQuality(level, text) {
+    const q = $('quality'), qt = $('qualityText');
+    qt.textContent = text;
+    q.removeAttribute('data-level');
+    if (level) q.setAttribute('data-level', level);
+}
+function setStatus(text, dotClass) {
+    $('statusText').textContent = text;
+    const dot = $('liveDot');
+    dot.className = 'live-dot' + (dotClass ? ' ' + dotClass : '');
+}
+function setWarmup(active) {
+    const el = $('warmupIndicator');
+    if (active) el.classList.add('active');
+    else el.classList.remove('active');
+}
+
+// ---------- CALCULATORS ----------
+function getCustomSizeMB() {
+    const val = parseFloat($('sizeInput').value) || 0;
+    const mult = parseFloat($('sizeUnit').value) || 1;
+    return val * mult;
+}
+function updateCalculators(speedMB) {
+    if (speedMB <= 0) return;
+    $('time1gb').textContent = formatTime(1024 / speedMB);
+    const sizeMB = getCustomSizeMB();
+    if (sizeMB > 0) $('customTime').textContent = formatTime(sizeMB / speedMB);
+    else $('customTime').textContent = '--:--';
+}
+
+// ---------- SCORES ----------
+function calcScores(dMbs, ping, jitter, bloat) {
+    const qText = dMbs > 10 ? t('qGood') : dMbs > 3 ? t('qAvg') : t('qBad');
+    const qLevel = dMbs > 10 ? 'good' : dMbs > 3 ? 'avg' : 'bad';
+    setQuality(qLevel, qText);
+
+    $('scoreStream').textContent = dMbs > 25 ? t('st4k') : dMbs > 10 ? t('stHd') : dMbs > 3 ? t('stSd') : t('stBad');
+    const totalLat = ping + jitter + bloat;
+    $('scoreGaming').textContent = totalLat < 50 ? t('gPro') : totalLat < 100 ? t('gStab') : t('gLag');
+    $('scoreCalls').textContent = (dMbs > 5 && ping < 100) ? t('cExcel') : (dMbs > 2) ? t('cGood') : t('cBad');
+    const mbps = dMbs * 8;
+    $('videoSpeed').textContent = mbps.toFixed(1) + ' Mbps';
+    let res = '';
+    if (mbps >= 25) res = '2160p (4K), 1080p, 720p';
+    else if (mbps >= 5) res = '1080p (Full HD), 720p';
+    else if (mbps >= 2.5) res = '720p (HD), 480p';
+    else if (mbps >= 1) res = '480p, 360p';
+    else res = '240p, 144p';
+    $('videoResolution').textContent = res;
+}
+
+// ---------- WAKE LOCK ----------
+async function acquireWakeLock() {
+    try {
+        if ('wakeLock' in navigator) state.wakeLock = await navigator.wakeLock.request('screen');
+    } catch(e) {}
+}
+function releaseWakeLock() {
+    try { if (state.wakeLock) state.wakeLock.release(); } catch(e) {}
+    state.wakeLock = null;
+}
+
+// ---------- NETWORK INFO ----------
+function updateNetworkInfo() {
+    const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (c && c.effectiveType) {
+        const map = { 'slow-2g': t('nt2gSlow'), '2g': t('nt2g'), '3g': t('nt3g'), '4g': t('nt4g') };
+        let txt = map[c.effectiveType] || c.effectiveType;
+        if (c.downlink) txt += ' • ' + c.downlink + ' Mbps';
+        $('netType').textContent = txt;
+    } else {
+        $('netType').textContent = t('ntUnsupported');
+    }
+}
+async function fetchIPInfo() {
+    try {
+        const r = await fetch('https://ipapi.co/json/');
+        if (!r.ok) throw new Error('fetch');
+        const d = await r.json();
+        state.netInfo = { isp: d.org, location: [d.city, d.country_name].filter(Boolean).join(', '), ip: d.ip };
+        $('netISP').textContent = d.org || '-';
+        $('netLocation').textContent = state.netInfo.location || '-';
+        $('netIP').textContent = d.ip || '-';
+        $('idCardISP').textContent = d.org || '-';
+        $('idCardLocation').textContent = state.netInfo.location || '-';
+        $('idCardIP').textContent = d.ip || '-';
+    } catch(e) {
+        $('netISP').textContent = t('netNotAvailable');
+        $('netLocation').textContent = t('netNotAvailable');
+        $('netIP').textContent = t('netNotAvailable');
+        $('idCardISP').textContent = t('netNotAvailable');
+        $('idCardLocation').textContent = t('netNotAvailable');
+        $('idCardIP').textContent = t('netNotAvailable');
+    }
+}
+
+// ---------- TEST ENGINE (formulas preserved exactly) ----------
+async function runPingTest() {
+    const arr = [];
+    try { await fetch(noCacheUrl(CONFIG.PING_URL), { cache: 'no-store', priority: 'high' }); } catch(e) {}
+    for (let i = 0; i < CONFIG.PING_COUNT; i++) {
+        const s = performance.now();
+        try {
+            await fetch(noCacheUrl(CONFIG.PING_URL), { cache: 'no-store', priority: 'high' });
+            arr.push(performance.now() - s);
+        } catch(e) {}
+    }
+    const avg = arr.length ? arr.reduce((a,b)=>a+b)/arr.length : 0;
+    const jit = arr.length ? Math.sqrt(arr.map(x => (x-avg)**2).reduce((a,b)=>a+b)/arr.length) : 0;
+    state.basePingMs = avg;
+    return { ping: Math.round(avg), jitter: Math.round(jit) };
+}
+
+async function runDownloadTest(seconds) {
+    const start = performance.now();
+    const controller = new AbortController();
+    let bytes = 0;
+    let isAborted = false;
+    state.currentMax = 0.5;
+    state.speeds = [];
+
+    const bloatController = new AbortController();
+    const activePings = [];
+    let bloatLock = false;
+    const bloatInterval = setInterval(async () => {
+        if (bloatLock || isAborted) return;
+        bloatLock = true;
+        const ts = performance.now();
+        try {
+            await fetch(noCacheUrl(CONFIG.PING_URL), { cache: 'no-store', signal: bloatController.signal });
+            activePings.push(performance.now() - ts);
+        } catch(e) {}
+        bloatLock = false;
+    }, CONFIG.BLOAT_CHECK_INTERVAL);
+
+    const timeout = setTimeout(() => {
+        isAborted = true;
+        try { controller.abort(); } catch(e) {}
+        try { bloatController.abort(); } catch(e) {}
+        clearInterval(bloatInterval);
+    }, seconds * 1000);
+
+    const dlPromise = (async () => {
+        try {
+            const r = await fetch(noCacheUrl(CONFIG.DOWNLOAD_URL, { bytes: CONFIG.DOWNLOAD_CHUNK_SIZE }), {
+                cache: 'no-store', signal: controller.signal
+            });
+            const reader = r.body.getReader();
+            while (!isAborted) {
+                const { done, value } = await reader.read();
+                if (done || isAborted) break;
+                bytes += value.length;
+            }
+        } catch(e) {}
+    })();
+
+    const uiLoop = setInterval(() => {
+        if (isAborted && bytes === 0) { clearInterval(uiLoop); return; }
+        const elapsed = (performance.now() - start) / 1000;
+        const speedMB = elapsed > 0 ? bytes / (1024*1024*elapsed) : 0;
+        if (speedMB > state.currentMax * 0.8) state.currentMax = speedMB * 1.5;
+
+        setSpeed(speedMB);
+        updateCalculators(speedMB);
+
+        state.speeds.push(speedMB);
+        if (state.speeds.length > CONFIG.GRAPH_MAX_POINTS) state.speeds.shift();
+        drawGraph();
+
+        const pct = Math.min(elapsed / seconds, 1);
+        setGaugeProgress(pct);
+
+        const left = Math.max(0, Math.ceil(seconds - elapsed));
+        setStatus(t('downing') + ' • ' + left + 's', 'running');
+
+        if (isAborted) clearInterval(uiLoop);
+    }, CONFIG.UI_UPDATE_INTERVAL);
+
+    setWarmup(true);
+    const warmupTimeout = setTimeout(() => setWarmup(false), 3000);
+
+    await dlPromise;
+
+    clearInterval(uiLoop);
+    clearInterval(bloatInterval);
+    clearTimeout(timeout);
+    clearTimeout(warmupTimeout);
+    setWarmup(false);
+    try { bloatController.abort(); } catch(e) {}
+
+    const totalTime = (performance.now() - start) / 1000;
+    const finalSpeedMB = bytes / (1024*1024*totalTime);
+    state.lastFinalSpeed = finalSpeedMB;
+
+    const avg = state.speeds.length ? state.speeds.reduce((a,b)=>a+b,0)/state.speeds.length : 0;
+    const stdev = state.speeds.length ? Math.sqrt(state.speeds.map(x=>(x-avg)**2).reduce((a,b)=>a+b,0)/state.speeds.length) : 0;
+    const stability = Math.max(0, 100 - (stdev / (avg || 1) * 100));
+    const noise = (stdev / (avg || 1) * 10).toFixed(1);
+    const jitterPct = ((stdev / (avg || 1)) * 100).toFixed(1);
+
+    const avgBloat = activePings.length ? activePings.reduce((a,b)=>a+b,0)/activePings.length : state.basePingMs;
+    const bloatDiff = Math.max(0, Math.round(avgBloat - state.basePingMs));
+
+    if (bytes === 0) throw new Error(t('testFailed'));
+
+    return { speed: finalSpeedMB, stability: stability.toFixed(0), bloat: bloatDiff, noise, jitterPct };
+}
+
+async function startTest() {
+    if (state.isRunning) return;
+    state.isRunning = true;
+
+    const btn = $('btnStart');
+    const ctaText = $('ctaText');
+    const fab = $('fab');
+    btn.disabled = true;
+    btn.classList.add('running');
+    ctaText.textContent = t('running');
+    fab.classList.add('running');
+    $('fabIcon').textContent = '⏳';
+
+    state.tag = ($('tagInput').value || '').trim();
+    state.speeds = [];
+    state.lastFinalSpeed = 0;
+
+    setSpeed(0);
+    setGaugeProgress(0);
+    setSpeedColor(0);
+    setStatus(t('conn'), 'running');
+    setQuality(null, t('qNone'));
+
+    ['scoreGaming','scoreStream','scoreCalls','videoSpeed','videoResolution'].forEach(id => $(id).textContent = '-');
+    $('downDiff').textContent = '';
+    $('downDiff').className = 'qs-diff';
+
+    await acquireWakeLock();
+
+    try {
+        devLog({ status: 'Ping test started', device: { cores: device.cores, memory: device.memory, lowEnd: device.isLowEnd } });
+        const pj = await runPingTest();
+        $('ping').textContent = pj.ping + ' ms';
+        $('jitter').textContent = pj.jitter + ' ms';
+        flash('ping'); flash('jitter');
+        state.results.ping = pj.ping;
+        state.results.jitter = pj.jitter;
+
+        const mos = calcMOS(pj.ping, pj.jitter);
+        state.results.mos = Number(mos.toFixed(1));
+        $('mos').textContent = mos.toFixed(1);
+        flash('mos');
+
+        devLog({ status: 'Download started', duration: state.duration + 's' });
+        const d = await runDownloadTest(state.duration);
+
+        $('down').textContent = formatSpeed(d.speed);
+        $('stability').textContent = d.stability + '%';
+        $('bufferbloat').textContent = '+' + d.bloat + ' ms';
+        $('noise').textContent = d.noise + ' dB';
+        $('jitterPct').textContent = d.jitterPct + '%';
+        flash('down');
+
+        state.results.download = Number(d.speed.toFixed(2));
+        state.results.bufferbloat = d.bloat;
+        state.results.stability = Number(d.stability);
+        state.results.noise = Number(d.noise);
+        state.results.jitterPct = Number(d.jitterPct);
+
+        // Compute score
+        const score = calcConnectionScore(
+            state.results.download,
+            state.results.ping,
+            state.results.jitter,
+            state.results.bufferbloat,
+            state.results.stability
+        );
+        state.results.score = score;
+        state.score = score;
+
+        // Update UI
+        updateScoreUI(score, state.results.download, state.results.ping, state.results.jitter, state.results.bufferbloat, state.results.stability);
+        updateReadinessUI(state.results.download, state.results.ping, state.results.jitter, state.results.bufferbloat);
+
+        // Identity card
+        const grade = gradeFromScore(score);
+        $('idCardBadge').textContent = grade;
+        $('idCardGrade').textContent = grade;
+        $('idCardSpeed').textContent = formatSpeed(state.results.download);
+
+        // Compare
+        const prev = getHistory()[0];
+        if (prev && typeof prev.download === 'number') {
+            const diff = state.results.download - prev.download;
+            const diffEl = $('downDiff');
+            if (Math.abs(diff) >= 0.05) {
+                diffEl.textContent = (diff > 0 ? '▲ +' : '▼ ') + diff.toFixed(2);
+                diffEl.className = 'qs-diff ' + (diff > 0 ? 'up' : 'down');
+            }
+        }
+
+        setSpeed(d.speed);
+        setSpeedColor(d.speed);
+        updateCalculators(d.speed);
+        calcScores(d.speed, pj.ping, pj.jitter, d.bloat);
+        setStatus(t('done'), '');
+        setGaugeProgress(1);
+        btn.classList.remove('running');
+        btn.classList.add('done');
+        ctaText.textContent = t('done');
+
+        state.results.timestamp = new Date().toISOString();
+
+        addHistory({
+            id: Date.now(),
+            tag: state.tag,
+            timestamp: state.results.timestamp,
+            download: state.results.download,
+            ping: state.results.ping,
+            jitter: state.results.jitter,
+            bufferbloat: state.results.bufferbloat,
+            stability: state.results.stability,
+            noise: state.results.noise,
+            jitterPct: state.results.jitterPct,
+            mos: state.results.mos,
+            score: state.results.score
+        });
+
+        devLog({ status: 'Test complete', results: state.results });
+
+        setTimeout(() => {
+            btn.classList.remove('done');
+            ctaText.textContent = t('btnStart');
+        }, 2500);
+
+    } catch(e) {
+        setStatus(t('err'), '');
+        devLog({ error: e.message });
+        toast(t('testFailed'), 'error');
+        btn.classList.remove('running');
+        ctaText.textContent = t('btnStart');
+    }
+
+    releaseWakeLock();
+    btn.disabled = false;
+    state.isRunning = false;
+    fab.classList.remove('running');
+    $('fabIcon').textContent = '⚡';
+}
+
+// ---------- SHARE / EXPORT ----------
+function buildReportText() {
+    const r = state.results;
+    return '⚡ TECHOVIA SPEED TEST\n━━━━━━━━━━━━━━━━\n' +
+        '⬇ Download: ' + r.download + ' MB/s\n' +
+        '⏱ Ping: ' + r.ping + ' ms\n' +
+        '〰 Jitter: ' + r.jitter + ' ms\n' +
+        '📊 Bufferbloat: +' + r.bufferbloat + ' ms\n' +
+        '📈 Stability: ' + r.stability + '%\n' +
+        '🎚 MOS: ' + r.mos + '\n' +
+        '🏆 Score: ' + (r.score || 0) + '/100\n' +
+        '🕒 ' + (r.timestamp || new Date().toISOString());
+}
+
+async function shareText() {
+    if (!state.results.timestamp) return toast(t('noReport'), 'error');
+    const text = buildReportText();
+    if (navigator.share) {
+        try { await navigator.share({ title: 'Techovia Speed Test', text }); return; } catch(e) {}
+    }
+    try { await navigator.clipboard.writeText(text); toast(t('copied'), 'success'); }
+    catch(e) { toast(t('copyFailed'), 'error'); }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+async function generateShareImage() {
+    const W = 1080, H = 1350;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d');
+
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#05101f');
+    bg.addColorStop(1, '#0a1a3a');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const rg = ctx.createRadialGradient(W/2, 420, 0, W/2, 420, 700);
+    rg.addColorStop(0, 'rgba(77,171,255,0.32)');
+    rg.addColorStop(1, 'rgba(77,171,255,0)');
+    ctx.fillStyle = rg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Logo
+    ctx.strokeStyle = '#4dabff'; ctx.lineWidth = 12;
+    ctx.beginPath(); ctx.arc(W/2, 180, 60, 0, Math.PI*2); ctx.stroke();
+    ctx.lineWidth = 10;
+    ctx.beginPath(); ctx.arc(W/2, 180, 44, 0, Math.PI*2); ctx.stroke();
+    ctx.fillStyle = '#4dabff';
+    ctx.beginPath();
+    ctx.moveTo(W/2, 90); ctx.lineTo(W/2 + 8, 165); ctx.lineTo(W/2, 230); ctx.lineTo(W/2 - 8, 165);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 60, 130); ctx.quadraticCurveTo(W/2 - 75, 180, W/2 - 40, 230);
+    ctx.quadraticCurveTo(W/2 - 55, 180, W/2 - 45, 130);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(W/2 + 60, 130); ctx.quadraticCurveTo(W/2 + 75, 180, W/2 + 40, 230);
+    ctx.quadraticCurveTo(W/2 + 55, 180, W/2 + 45, 130);
+    ctx.closePath(); ctx.fill();
+
+    ctx.fillStyle = '#b6e1ff';
+    ctx.font = 'bold 34px "Space Grotesk", system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('TECHOVIA SPEED TEST', W/2, 320);
+
+    const speedStr = state.results.download >= 1 ? state.results.download.toFixed(2) : (state.results.download*1024).toFixed(0);
+    const unitStr = state.results.download >= 1 ? 'MB/s' : 'KB/s';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 160px "Space Grotesk", system-ui, sans-serif';
+    ctx.fillText(speedStr, W/2, 500);
+    ctx.fillStyle = '#7dc8ff';
+    ctx.font = 'bold 32px "Space Grotesk", system-ui, sans-serif';
+    ctx.fillText(unitStr, W/2, 610);
+
+    const score = state.results.score || 0;
+    const grade = gradeFromScore(score);
+    ctx.fillStyle = score >= 75 ? '#34d399' : score >= 50 ? '#fbbf24' : '#f87171';
+    ctx.font = 'bold 26px "Space Grotesk", system-ui, sans-serif';
+    ctx.fillText('GRADE ' + grade + ' • ' + score + '/100', W/2, 680);
+
+    const metrics = [
+        { l: 'PING', v: state.results.ping + ' ms' },
+        { l: 'JITTER', v: state.results.jitter + ' ms' },
+        { l: 'STABILITY', v: state.results.stability + '%' },
+        { l: 'MOS', v: (state.results.mos || 0).toFixed(1) }
+    ];
+    const cardW = 220, cardH = 150, gap = 24;
+    const gridW = cardW*2 + gap;
+    const startX = (W - gridW) / 2;
+    const startY = 780;
+    metrics.forEach((m, i) => {
+        const col = i % 2, row = Math.floor(i / 2);
+        const x = startX + col * (cardW + gap);
+        const y = startY + row * (cardH + gap);
+        ctx.fillStyle = 'rgba(77,171,255,0.08)';
+        roundRect(ctx, x, y, cardW, cardH, 20); ctx.fill();
+        ctx.strokeStyle = 'rgba(77,171,255,0.15)';
+        ctx.lineWidth = 2;
+        roundRect(ctx, x, y, cardW, cardH, 20); ctx.stroke();
+
+        ctx.fillStyle = '#7a92b8';
+        ctx.font = 'bold 18px "Space Grotesk", system-ui, sans-serif';
+        ctx.fillText(m.l, x + cardW/2, y + 45);
+        ctx.fillStyle = '#eaf3ff';
+        ctx.font = 'bold 44px "Space Grotesk", system-ui, sans-serif';
+        ctx.fillText(m.v, x + cardW/2, y + 100);
+    });
+
+    const date = new Date(state.results.timestamp || Date.now());
+    ctx.fillStyle = '#4a6280';
+    ctx.font = '500 18px "Space Grotesk", system-ui, sans-serif';
+    ctx.fillText(date.toLocaleString(), W/2, H - 60);
+    if (state.tag) {
+        ctx.fillStyle = '#7dc8ff';
+        ctx.font = 'bold 22px "Space Grotesk", system-ui, sans-serif';
+        ctx.fillText('#' + state.tag, W/2, H - 110);
+    }
+
+    return new Promise(res => c.toBlob(res, 'image/png', 0.95));
+}
+
+async function shareImage() {
+    if (!state.results.timestamp) return toast(t('noReport'), 'error');
+    toast(t('imgCreating'));
+    const blob = await generateShareImage();
+    if (!blob) return toast(t('imgFailed'), 'error');
+    const file = new File([blob], 'techovia-result.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: 'Techovia Result' }); return; } catch(e) {}
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'techovia_' + Date.now() + '.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    toast(t('imgSaved'), 'success');
+}
+
+async function copyReport() {
+    if (!state.results.timestamp) return toast(t('noReport'), 'error');
+    try { await navigator.clipboard.writeText(buildReportText()); toast(t('copied'), 'success'); }
+    catch(e) { toast(t('copyFailed'), 'error'); }
+}
+
+function exportJSON() {
+    if (!state.results.timestamp) return toast(t('noReport'), 'error');
+    const data = JSON.stringify(state.results, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'techovia_report_' + Date.now() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+// ---------- THEME / LANG ----------
+function applyTheme() {
+    document.documentElement.setAttribute('data-theme', state.isDark ? 'dark' : 'light');
+    $('themeIcon').textContent = state.isDark ? '☀️' : '🌙';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', state.isDark ? '#05080f' : '#f5f8fc');
+    drawGraph();
+    renderTrends();
+}
+
+function applyLang() {
+    document.documentElement.lang = state.currentLang;
+    document.documentElement.dir = state.currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
+    });
+    document.title = t('pageTitle');
+    if (!state.isRunning && !state.results.timestamp) setStatus(t('ready'), '');
+    if (state.results.download > 0) {
+        calcScores(state.results.download, state.results.ping, state.results.jitter, state.results.bufferbloat);
+        updateScoreUI(state.results.score, state.results.download, state.results.ping, state.results.jitter, state.results.bufferbloat, state.results.stability);
+    }
+    updateNetworkInfo();
+    renderHistory();
+    renderTrends();
+}
+
+// ---------- SHEETS ----------
+function openSheet(id) {
+    document.body.style.overflow = 'hidden';
+    document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
+    const el = $(id + 'Sheet');
+    if (el) el.classList.add('active');
+    $('fab').classList.remove('visible');
+}
+function closeSheet(id) {
+    document.body.style.overflow = '';
+    const el = $(id + 'Sheet');
+    if (el) el.classList.remove('active');
+    updateFabVisibility();
+}
+
+// ---------- FAB visibility ----------
+let fabObserver;
+function updateFabVisibility() {
+    const fab = $('fab');
+    if (!fab) return;
+    if (document.querySelector('.sheet.active')) { fab.classList.remove('visible'); return; }
+    const startBtn = $('btnStart');
+    const rect = startBtn.getBoundingClientRect();
+    const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+    if (isVisible) fab.classList.remove('visible');
+    else fab.classList.add('visible');
+}
+
+// ---------- PWA ----------
+function setupPWA() {
+    const manifest = {
+        name: 'Techovia Speed Test',
+        short_name: 'Techovia',
+        description: 'Advanced Internet Speed Testing Tool',
+        start_url: './', scope: './',
+        display: 'standalone', orientation: 'portrait',
+        background_color: '#05080f', theme_color: '#4dabff',
+        icons: [{ src: './assets/logo.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+    const link = $('manifestLink');
+    if (link) link.setAttribute('href', URL.createObjectURL(blob));
+}
+
+// ---------- INIT ----------
+function init() {
+    const savedLang = getStored(CONFIG.LANG_KEY);
+    if (savedLang && T[savedLang]) state.currentLang = savedLang;
+    else state.currentLang = (navigator.language || 'ar').startsWith('ar') ? 'ar' : 'en';
+
+    const savedTheme = getStored(CONFIG.THEME_KEY);
+    if (savedTheme) state.isDark = savedTheme === 'dark';
+    else state.isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    applyTheme();
+    applyLang();
+    $('langSelect').value = state.currentLang;
+
+    $('sizeInput').addEventListener('input', () => { if (state.lastFinalSpeed > 0) updateCalculators(state.lastFinalSpeed); });
+    $('sizeUnit').addEventListener('change', () => { if (state.lastFinalSpeed > 0) updateCalculators(state.lastFinalSpeed); });
+
+    $('btnStart').addEventListener('click', startTest);
+    $('fab').addEventListener('click', () => { if (!state.isRunning) startTest(); });
+
+    document.querySelectorAll('.segmented button').forEach(b => {
+        b.addEventListener('click', () => {
+            document.querySelectorAll('.segmented button').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            const tab = b.getAttribute('data-tab');
+            document.querySelectorAll('.tab-content').forEach(tc => {
+                tc.classList.toggle('active', tc.getAttribute('data-tab') === tab);
+            });
+            if (tab === 'overview') setTimeout(drawGraph, 30);
+            if (tab === 'trends') setTimeout(renderTrends, 30);
+        });
+    });
+
+    $('themeToggle').addEventListener('click', () => {
+        state.isDark = !state.isDark;
+        setStored(CONFIG.THEME_KEY, state.isDark ? 'dark' : 'light');
+        applyTheme();
+    });
+
+    $('langSelect').addEventListener('change', (e) => {
+        state.currentLang = T[e.target.value] ? e.target.value : 'en';
+        setStored(CONFIG.LANG_KEY, state.currentLang);
+        applyLang();
+    });
+
+    $('settingsBtn').addEventListener('click', () => openSheet('settings'));
+    document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closeSheet(b.getAttribute('data-close'))));
+    document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openSheet(b.getAttribute('data-open'))));
+    document.querySelectorAll('.sheet').forEach(s => {
+        s.addEventListener('click', e => { if (e.target === s) closeSheet(s.getAttribute('data-sheet')); });
+    });
+
+    document.querySelectorAll('.duration-options button').forEach(b => {
+        b.addEventListener('click', () => {
+            document.querySelectorAll('.duration-options button').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            state.duration = Number(b.getAttribute('data-duration'));
+        });
+    });
+
+    // Trend filters
+    document.querySelectorAll('.trend-filter button').forEach(b => {
+        b.addEventListener('click', () => {
+            document.querySelectorAll('.trend-filter button').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            trendsFilterDays = Number(b.getAttribute('data-days'));
+            renderTrends();
+        });
+    });
+
+    $('shareBtn').addEventListener('click', shareText);
+    $('shareImageBtn').addEventListener('click', shareImage);
+    $('copyBtn').addEventListener('click', copyReport);
+    $('exportBtn').addEventListener('click', exportJSON);
+    $('clearHistory').addEventListener('click', clearHistory);
+
+    document.querySelectorAll('[data-copy]').forEach(b => {
+        b.addEventListener('click', () => {
+            navigator.clipboard.writeText(b.getAttribute('data-copy'))
+                .then(() => toast(t('copied'), 'success'))
+                .catch(() => toast(t('copyFailed'), 'error'));
+        });
+    });
+
+    const c = $('graph');
+    c.addEventListener('mousemove', handleGraphHover);
+    c.addEventListener('mouseleave', hideGraphTip);
+    c.addEventListener('touchstart', handleGraphHover, { passive: true });
+    c.addEventListener('touchmove', handleGraphHover, { passive: true });
+    c.addEventListener('touchend', hideGraphTip);
+
+    if ('ResizeObserver' in window) {
+        new ResizeObserver(() => { drawGraph(); renderTrends(); }).observe(document.querySelector('.app'));
+    }
+    window.addEventListener('resize', () => { drawGraph(); renderTrends(); });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.sheet.active').forEach(s => s.classList.remove('active'));
+            document.body.style.overflow = '';
+            updateFabVisibility();
+        }
+        if (e.code === 'Space' && !state.isRunning && document.activeElement.tagName !== 'INPUT') {
+            e.preventDefault();
+            startTest();
+        }
+    });
+
+    window.addEventListener('scroll', updateFabVisibility, { passive: true });
+    window.addEventListener('resize', updateFabVisibility);
+
+    updateNetworkInfo();
+    fetchIPInfo();
+    renderHistory();
+    renderTrends();
+
+    window.TechoviaAPI = {
+        get results() { return state.results; },
+        get history() { return getHistory(); },
+        get device() { return device; },
+        start: startTest
+    };
+
+    requestAnimationFrame(() => {
+        drawGraph();
+        renderTrends();
+        updateFabVisibility();
+        setTimeout(() => { drawGraph(); renderTrends(); updateFabVisibility(); }, 100);
+    });
+
+    setupPWA();
+
+    console.log('%c⚡ TECHOVIA Speed Test v6.0', 'color:#4dabff;font-size:16px;font-weight:bold;');
+    console.log('Device:', device);
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+})();
+</script>
+</body>
+</html>
