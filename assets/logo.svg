@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="512" height="560"
+     viewBox="0 0 512 560">
+
+  <defs>
+    <!-- Metallic blue -->
+    <linearGradient id="metal"
+      x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0053B8"/>
+      <stop offset="18%" stop-color="#38B9FF"/>
+      <stop offset="38%" stop-color="#B8F5FF"/>
+      <stop offset="55%" stop-color="#168BEF"/>
+      <stop offset="78%" stop-color="#0070D8"/>
+      <stop offset="100%" stop-color="#00377E"/>
+    </linearGradient>
+
+    <!-- Blade highlights -->
+    <linearGradient id="blade"
+      x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0072D9"/>
+      <stop offset="30%" stop-color="#42BCFF"/>
+      <stop offset="48%" stop-color="#D4FAFF"/>
+      <stop offset="68%" stop-color="#36B7FF"/>
+      <stop offset="100%" stop-color="#0050AC"/>
+    </linearGradient>
+
+    <!-- Metallic edge -->
+    <linearGradient id="edge"
+      x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C9F8FF"/>
+      <stop offset="45%" stop-color="#1689E9"/>
+      <stop offset="100%" stop-color="#00377E"/>
+    </linearGradient>
+
+    <!-- Subtle depth -->
+    <filter id="depth"
+      x="-25%" y="-25%"
+      width="150%" height="150%">
+      <feGaussianBlur in="SourceAlpha"
+        stdDeviation="3" result="blur"/>
+      <feOffset in="blur" dx="1" dy="4"
+        result="offset"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.5"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g filter="url(#depth)"
+     stroke-linejoin="round">
+
+    <!-- Outer open circular arc -->
+    <path
+      d="M 158 125
+         A 205 205 0 1 0 354 125"
+      fill="none"
+      stroke="#003B83"
+      stroke-width="24"/>
+
+    <path
+      d="M 158 125
+         A 205 205 0 1 0 354 125"
+      fill="none"
+      stroke="url(#metal)"
+      stroke-width="18"/>
+
+    <!-- Inner open circular arc -->
+    <path
+      d="M 178 151
+         A 170 170 0 1 0 334 151"
+      fill="none"
+      stroke="#003A80"
+      stroke-width="23"/>
+
+    <path
+      d="M 178 151
+         A 170 170 0 1 0 334 151"
+      fill="none"
+      stroke="url(#metal)"
+      stroke-width="15"/>
+
+    <!-- Central vertical blade -->
+    <path
+      d="M 256 8
+         L 264 118
+         L 256 355
+         L 248 118 Z"
+      fill="url(#blade)"
+      stroke="#83E7FF"
+      stroke-width="1.5"/>
+
+    <!-- Left curved blade -->
+    <path
+      d="M 133 104
+         C 183 137 221 193 217 278
+         C 216 222 204 162 133 104 Z"
+      fill="url(#blade)"
+      stroke="#8BEAFF"
+      stroke-width="1.2"/>
+
+    <!-- Right curved blade -->
+    <path
+      d="M 379 104
+         C 329 137 291 193 295 278
+         C 296 222 308 162 379 104 Z"
+      fill="url(#blade)"
+      stroke="#8BEAFF"
+      stroke-width="1.2"/>
+
+  </g>
+</svg>
