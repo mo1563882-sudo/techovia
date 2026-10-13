@@ -181,7 +181,7 @@ select.chip option{background:var(--bg);color:var(--text-1);}
 .id-card-body{position:relative;z-index:1;display:flex;flex-direction:column;gap:10px;}
 .id-card-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
 .id-card-key{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;opacity:0.7;font-weight:600;}
-.id-card-val{font-family:var(--font-display);font-size:13px;font-weight:700;text-align:end;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%;}
+.id-card-val{font-family:var(--font-display);font-size:12.5px;font-weight:700;text-align:end;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;max-width:72%;word-break:break-word;}
 .id-card-divider{height:1px;background:rgba(255,255,255,0.15);margin:4px 0;position:relative;z-index:1;}
 .id-card-footer{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.18);display:flex;justify-content:space-between;align-items:flex-end;gap:12px;position:relative;z-index:1;}
 .id-card-footer-left{display:flex;flex-direction:column;gap:3px;}
@@ -1068,8 +1068,51 @@ function updateNetworkInfo(){
     if(connEl) connEl.textContent = connType;
 }
 
+// ===================== ISP NAME TABLE (ASN → Trade Name) =====================
+const ASN_NAMES = {
+    'AS29256': 'Tarassul Internet Service Provider',
+    'AS29386': 'Tarassul Internet Service Provider',
+    'AS201550': 'Tarassul Internet Service Provider'
+};
+
+// ===================== COUNTRY SHORT NAMES =====================
+const COUNTRY_SHORT = {
+    'Syrian Arab Republic': 'Syria',
+    'United States of America': 'United States',
+    'United Kingdom of Great Britain and Northern Ireland': 'United Kingdom',
+    'Russian Federation': 'Russia',
+    'Iran, Islamic Republic of': 'Iran',
+    'Korea, Republic of': 'South Korea',
+    "Korea, Democratic People's Republic of": 'North Korea',
+    'Viet Nam': 'Vietnam',
+    'Czechia': 'Czech Republic',
+    'Türkiye': 'Turkey',
+    'Bolivia, Plurinational State of': 'Bolivia',
+    'Venezuela, Bolivarian Republic of': 'Venezuela',
+    'Tanzania, United Republic of': 'Tanzania',
+    'Moldova, Republic of': 'Moldova',
+    'Macedonia, the former Yugoslav Republic of': 'North Macedonia',
+    'Palestine, State of': 'Palestine',
+    'Taiwan, Province of China': 'Taiwan',
+    'Congo, The Democratic Republic of the': 'DR Congo',
+    'Lao People\'s Democratic Republic': 'Laos',
+    'Brunei Darussalam': 'Brunei',
+    'Cabo Verde': 'Cape Verde',
+    'Côte d\'Ivoire': 'Ivory Coast',
+    'Eswatini': 'Swaziland',
+    'Holy See (Vatican City State)': 'Vatican City',
+    'Micronesia, Federated States of': 'Micronesia',
+    'Sao Tome and Principe': 'São Tomé and Príncipe',
+    'Timor-Leste': 'East Timor'
+};
+
+function shortCountry(name){
+    if(!name) return '';
+    return COUNTRY_SHORT[name] || name;
+}
+
 async function fetchIPInfo(){
-    // Cache check
+    // 1) Cache check
     try {
         const cacheRaw = getStored(CONFIG.IPINFO_CACHE_KEY);
         if(cacheRaw){
@@ -1081,17 +1124,101 @@ async function fetchIPInfo(){
         }
     } catch(e){}
 
-    // Fetch chain: ipwho.is -> ipapi.co
-    const apis = [
-        {
-            url: 'https://ipwho.is/',
-            parse: d => ({ isp: d.connection && (d.connection.isp || d.connection.org), location: [d.city, d.country].filter(Boolean).join(', '), ip: d.ip, ipType: d.type })
-        },
-        {
-            url: 'https://ipapi.co/json/',
-            parse: d => ({ isp: d.org, location: [d.city, d.country_name].filter(Boolean).join(', '), ip: d.ip, ipType: d.version })
+    // 2) Base info from ipwho.is (IP + ASN + ISP)
+    let baseInfo = null;
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(()=>controller.abort(), 8000);
+        const r = await fetch('https://ipwho.is/', { signal: controller.signal });
+        clearTimeout(timeout);
+        if(r.ok){
+            const d = await r.json();
+            if(d && d.ip){
+                const conn = d.connection || {};
+                baseInfo = {
+                    ip: d.ip,
+                    ipType: d.type,
+                    asn: conn.asn ? 'AS' + String(conn.asn).replace(/^AS/i,'') : null,
+                    isp: conn.isp || conn.org || null,
+                    city: d.city || null,
+                    country: d.country || null
+                };
+            }
         }
-    ];
+    } catch(e){}
+
+    // 3) Fallback: ipapi.co
+    if(!baseInfo){
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(()=>controller.abort(), 8000);
+            const r = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+            clearTimeout(timeout);
+            if(r.ok){
+                const d = await r.json();
+                if(d && d.ip){
+                    baseInfo = {
+                        ip: d.ip,
+                        ipType: d.version,
+                        asn: d.asn ? String(d.asn).replace(/^AS/i,'') : null,
+                        isp: d.org || null,
+                        city: d.city || null,
+                        country: d.country_name || null
+                    };
+                    if(baseInfo.asn) baseInfo.asn = 'AS' + baseInfo.asn;
+                }
+            }
+        } catch(e){}
+    }
+
+    if(!baseInfo || !baseInfo.ip){
+        ['idCardISP','idCardLocation','idCardIP','idCardIPType'].forEach(id => {
+            const el=$(id); if(el) el.textContent = t('netNotAvailable');
+        });
+        return;
+    }
+
+    // 4) Improve location with DB-IP City Lite (geo.wp-statistics.com)
+    let dbipLocation = null;
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(()=>controller.abort(), 6000);
+        const url = 'https://geo.wp-statistics.com/api/lookup?ip=' + encodeURIComponent(baseInfo.ip) + '&db=dbip&format=json';
+        const r = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeout);
+        if(r.ok){
+            const d = await r.json();
+            if(d && d.city){
+                dbipLocation = {
+                    city: d.city,
+                    country: d.country,
+                    countryCode: d.country_code
+                };
+            }
+        }
+    } catch(e){}
+
+    // 5) Merge: DB-IP location (more accurate) > ipwho.is location
+    const city = dbipLocation ? dbipLocation.city : baseInfo.city;
+    const country = dbipLocation ? dbipLocation.country : baseInfo.country;
+    const shortName = shortCountry(country);
+    const location = [city, shortName].filter(Boolean).join(', ');
+
+    // 6) Resolve ISP trade name from ASN
+    const ispName = (baseInfo.asn && ASN_NAMES[baseInfo.asn]) || baseInfo.isp || '—';
+
+    const data = {
+        isp: ispName,
+        location: location,
+        ip: baseInfo.ip,
+        ipType: baseInfo.ipType
+    };
+
+    // 7) Cache for 24h
+    try { setStored(CONFIG.IPINFO_CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e){}
+
+    applyIPInfo(data);
+}
 
     for(const api of apis){
         try {
