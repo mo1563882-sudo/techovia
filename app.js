@@ -931,21 +931,13 @@ const sunIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const moonIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
 
 function loadThemes(){
-    const defaultTheme = {
-        id: "neon-dark",
-        name: "Neon Dark (الافتراضي)",
-        file: "",
-        colors: ["#080B14", "#3B82F6", "#F9FAFB"]
-    };
-
     fetch('./themes.json')
     .then(r=>r.ok?r.json():[])
     .then(themes=>{
         const grid=$('themeGrid'); if(!grid) return;
         
-        const allThemes = [defaultTheme, ...themes];
-        
-        grid.innerHTML=allThemes.map(t=>`
+        // بناء أزرار الثيمات
+        grid.innerHTML=themes.map(t=>`
             <div class="theme-card ${t.id===state.currentTheme?'active':''}" data-theme-id="${t.id}" data-theme-file="${t.file||''}">
                 <div class="theme-swatch">
                     <span style="background:${t.colors[0]}"></span>
@@ -956,37 +948,30 @@ function loadThemes(){
             </div>
         `).join('');
         
+        // ربط حدث الضغط
         grid.querySelectorAll('.theme-card').forEach(card=>{
             card.addEventListener('click',()=>{
                 const id=card.getAttribute('data-theme-id');
                 const file=card.getAttribute('data-theme-file');
+                
                 state.currentTheme=id;
                 setStored(CONFIG.THEME_KEY, id);
                 document.documentElement.setAttribute('data-theme', id);
-                const link=$('external-theme-link');
-                if(link){
-                    if(file) link.href=file;
-                    else link.href='';
+                
+                // تحديث رابط ملف الـ CSS الخارجي (الموجود مسبقاً في index.html)
+                const link = $('external-theme-link');
+                if (link) {
+                    // إذا كان هناك ملف، نضع مساره. إذا لا، نتركه فارغاً (لأن الثيم مدمج)
+                    link.href = file ? file : ''; 
                 }
+                
                 grid.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
                 card.classList.add('active');
                 setTimeout(()=>{drawGraph(); renderTrends();}, 100);
-                toast('Theme: '+card.querySelector('.theme-name').textContent, 'success');
             });
         });
     }).catch(err=>{
-        console.log('Using default theme only.', err);
-        const grid=$('themeGrid'); if(!grid) return;
-        grid.innerHTML=`
-            <div class="theme-card active" data-theme-id="neon-dark" data-theme-file="">
-                <div class="theme-swatch">
-                    <span style="background:#080B14"></span>
-                    <span style="background:#3B82F6"></span>
-                    <span style="background:#F9FAFB"></span>
-                </div>
-                <div class="theme-name">Neon Dark (الافتراضي)</div>
-            </div>
-        `;
+        console.error('Theme error:', err);
     });
 }
 
