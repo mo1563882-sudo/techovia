@@ -1,8 +1,8 @@
 [
   {
-    "id": "light.css",
+    "id": "light",
     "name": "الوضع الفاتح (Light)",
-    "file": "./themes/theme-light.css",
+    "file": "./themes/light.css",
     "colors": ["#F3F4F6", "#2563EB", "#111827"]
   },
   {
