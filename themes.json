@@ -8,7 +8,7 @@
   {
     "id": "emerald",
     "name": "الزمردي (Emerald)",
-    "file": "./themes/theme-emerald.css",
+    "file": "./themes/emerald.css",
     "colors": ["#06120E", "#10B981", "#ECFDF5"]
   }
 ]
