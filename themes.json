@@ -1,5 +1,11 @@
 [
   {
+    "id": "neon-dark",
+    "name": "Neon Dark (الافتراضي)",
+    "file": "",
+    "colors": ["#080B14", "#3B82F6", "#F9FAFB"]
+  },
+  {
     "id": "light",
     "name": "الوضع الفاتح (Light)",
     "file": "theme-light.css",
