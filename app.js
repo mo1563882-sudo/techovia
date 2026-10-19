@@ -77,37 +77,152 @@ function _drawGraph(){
     const g=resizeCanvas(); if(!g) return;
     const ctx=g.ctx,w=g.w,h=g.h;
     ctx.setTransform(g.dpr,0,0,g.dpr,0,0); ctx.clearRect(0,0,w,h);
-    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
-    const padL=6,padR=42,padT=14,padB=16;
+    
+    // استخدام ألوان الثيم الحالي
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const padL=8,padR=42,padT=20,padB=20;
     const plotW=w-padL-padR,plotH=h-padT-padB;
-    const textDim=isDark?'rgba(156,163,175,0.9)':'rgba(107,114,128,1)';
-    const gridLine=isDark?'rgba(59,130,246,0.07)':'rgba(37,99,235,0.05)';
-    const gridStrong=isDark?'rgba(59,130,246,0.16)':'rgba(37,99,235,0.10)';
-    const strokeC1=isDark?'#3B82F6':'#2563EB'; const strokeC2=isDark?'#38BDF8':'#0284C7';
-    const prevColor=isDark?'#9CA3AF':'#6B7280';
+    
+    const textDim = isDark ? 'rgba(156,163,175,0.9)' : 'rgba(107,114,128,1)';
+    const gridLine = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)';
+    const strokeC1 = isDark ? '#3B82F6' : '#2563EB'; 
+    const strokeC2 = isDark ? '#38BDF8' : '#0284C7';
+    
     let peak=0;
     for(let i=0;i<state.speeds.length;i++) if(state.speeds[i]>peak) peak=state.speeds[i];
     for(let i=0;i<state.previousSpeeds.length;i++) if(state.previousSpeeds[i]>peak) peak=state.previousSpeeds[i];
     const effectiveMax=Math.max(state.currentMax,peak*1.15,0.05);
-    const isKbMode=effectiveMax<1;
-    if($('graphLabel')) $('graphLabel').textContent=isKbMode?'KB/s':'MB/s';
-    const rows=3;
-    ctx.font='500 9px "Space Grotesk", system-ui, sans-serif';
+    
+    if($('graphLabel')) $('graphLabel').textContent=effectiveMax<1?'KB/s':'MB/s';
+    
+    // رسم خطوط الشبكة الأفقية الخافتة
+    const rows=4;
+    ctx.font='500 10px "Space Grotesk", system-ui, sans-serif';
     ctx.textAlign='right'; ctx.textBaseline='middle';
-    for(let i=0;i<=rows;i++){const y=padT+plotH*(i/rows); ctx.strokeStyle=i===rows?gridStrong:gridLine; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+plotW,y); ctx.stroke(); const val=effectiveMax*(1-i/rows); ctx.fillStyle=textDim; const lbl=val>=1?val.toFixed(val>=10?0:1):(val*1024).toFixed(0); ctx.fillText(lbl,w-4,y);}
+    for(let i=0;i<=rows;i++){
+        const y=padT+plotH*(i/rows); 
+        ctx.strokeStyle=gridLine; 
+        ctx.lineWidth=1; 
+        ctx.beginPath(); 
+        ctx.moveTo(padL,y); 
+        ctx.lineTo(padL+plotW,y); 
+        ctx.stroke(); 
+        
+        const val=effectiveMax*(1-i/rows); 
+        ctx.fillStyle=textDim; 
+        const lbl=val>=1?val.toFixed(val>=10?0:1):(val*1024).toFixed(0); 
+        ctx.fillText(lbl,w-8,y);
+    }
+    
     ctx.textAlign='center'; ctx.textBaseline='top';
     const sampleSec=CONFIG.UI_UPDATE_INTERVAL/1000;
-    for(let i=0;i<=3;i++){const x=padL+plotW*(i/3); const tSec=state.duration*(i/3); ctx.fillStyle=textDim; ctx.fillText(tSec.toFixed(1)+'s',x,padT+plotH+3);}
-    if(state.speeds.length<2 && state.previousSpeeds.length<2){$('graphEmpty').classList.toggle('hidden', state.speeds.length>0||state.previousSpeeds.length>0); return;}
-    $('graphEmpty').classList.add('hidden');
+    for(let i=0;i<=3;i++){
+        const x=padL+plotW*(i/3); 
+        const tSec=state.duration*(i/3); 
+        ctx.fillStyle=textDim; 
+        ctx.fillText(tSec.toFixed(1)+'s',x,padT+plotH+8);
+    }
+    
+    if(state.speeds.length<2 && state.previousSpeeds.length<2){
+        if($('graphEmpty')) $('graphEmpty').classList.toggle('hidden', state.speeds.length>0||state.previousSpeeds.length>0); 
+        return;
+    }
+    if($('graphEmpty')) $('graphEmpty').classList.add('hidden');
+    
+    // رسم الخط السابق (الظل)
     if(state.previousSpeeds.length>1){
-        const prevPts=state.previousSpeeds.map((s,i)=>{const tSec=i*sampleSec; return {x:padL+Math.min(tSec/state.duration,1)*plotW, y:padT+plotH-Math.min((s/effectiveMax)*plotH,plotH)};}).filter(p=>p.x<=padL+plotW);
+        const prevPts=state.previousSpeeds.map((s,i)=>{
+            const tSec=i*sampleSec; 
+            return {x:padL+Math.min(tSec/state.duration,1)*plotW, y:padT+plotH-Math.min((s/effectiveMax)*plotH,plotH)};
+        }).filter(p=>p.x<=padL+plotW);
+        
         if(prevPts.length>1){
-            ctx.save(); ctx.beginPath(); ctx.moveTo(prevPts[0].x,prevPts[0].y);
-            for(let i=1;i<prevPts.length;i++){const p=prevPts[i-1],cc=prevPts[i]; const cx=(p.x+cc.x)/2; ctx.bezierCurveTo(cx,p.y,cx,cc.y,cc.x,cc.y);}
-            ctx.strokeStyle=prevColor; ctx.lineWidth=1.8; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.setLineDash([4,3]); ctx.globalAlpha=0.7; ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1; ctx.restore();
+            ctx.save(); 
+            ctx.beginPath(); 
+            ctx.moveTo(prevPts[0].x,prevPts[0].y);
+            for(let i=1;i<prevPts.length;i++){
+                const p=prevPts[i-1],cc=prevPts[i]; 
+                const cx=(p.x+cc.x)/2; 
+                ctx.bezierCurveTo(cx,p.y,cx,cc.y,cc.x,cc.y);
+            }
+            ctx.strokeStyle='rgba(255,255,255,0.15)'; 
+            ctx.lineWidth=2; 
+            ctx.lineJoin='round'; 
+            ctx.lineCap='round'; 
+            ctx.setLineDash([5,5]); 
+            ctx.stroke(); 
+            ctx.setLineDash([]); 
+            ctx.restore();
         }
     }
+    
+    // رسم الخط الحالي (المتوهج)
+    if(state.speeds.length>1){
+        const pts=state.speeds.map((s,i)=>{
+            const tSec=i*sampleSec; 
+            return {x:padL+Math.min(tSec/state.duration,1)*plotW, y:padT+plotH-Math.min((s/effectiveMax)*plotH,plotH)};
+        });
+        
+        const buildPath=()=>{
+            ctx.beginPath(); 
+            ctx.moveTo(pts[0].x,pts[0].y); 
+            for(let i=1;i<pts.length;i++){
+                const p=pts[i-1],cc=pts[i]; 
+                const cx=(p.x+cc.x)/2; 
+                ctx.bezierCurveTo(cx,p.y,cx,cc.y,cc.x,cc.y);
+            }
+        };
+        
+        // التعبئة المتدرجة تحت الخط
+        const grad=ctx.createLinearGradient(0,padT,0,padT+plotH);
+        grad.addColorStop(0, 'rgba(59,130,246,0.25)'); 
+        grad.addColorStop(1, 'rgba(59,130,246,0)'); 
+        
+        buildPath(); 
+        ctx.lineTo(pts[pts.length-1].x,padT+plotH); 
+        ctx.lineTo(pts[0].x,padT+plotH); 
+        ctx.closePath(); 
+        ctx.fillStyle=grad; 
+        ctx.fill();
+        
+        // الخط المتوهج
+        ctx.save(); 
+        ctx.shadowColor=strokeC1; 
+        ctx.shadowBlur=12; 
+        buildPath(); 
+        
+        const lineGrad=ctx.createLinearGradient(padL,0,padL+plotW,0); 
+        lineGrad.addColorStop(0,strokeC2); 
+        lineGrad.addColorStop(1,strokeC1); 
+        ctx.strokeStyle=lineGrad; 
+        ctx.lineWidth=3; 
+        ctx.lineJoin='round'; 
+        ctx.lineCap='round'; 
+        ctx.stroke(); 
+        ctx.restore();
+        
+        // النقطة الأخيرة
+        const last=pts[pts.length-1];
+        ctx.beginPath(); ctx.arc(last.x,last.y,8,0,Math.PI*2); ctx.fillStyle='rgba(59,130,246,0.2)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(last.x,last.y,4,0,Math.PI*2); ctx.fillStyle=strokeC1; ctx.fill();
+        ctx.beginPath(); ctx.arc(last.x,last.y,2,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+    }
+    
+    if(graphHoverIdx>=0 && graphHoverIdx<state.speeds.length && state.speeds.length>1){
+        const tSec=graphHoverIdx*sampleSec;
+        const hpX=padL+Math.min(tSec/state.duration,1)*plotW;
+        const hpY=padT+plotH-Math.min((state.speeds[graphHoverIdx]/effectiveMax)*plotH,plotH);
+        ctx.save(); 
+        ctx.strokeStyle='rgba(59,130,246,0.3)'; 
+        ctx.lineWidth=1; 
+        ctx.setLineDash([4,4]); 
+        ctx.beginPath(); 
+        ctx.moveTo(hpX,padT); 
+        ctx.lineTo(hpX,padT+plotH); 
+        ctx.stroke(); 
+        ctx.restore();
+    }
+}
     if(state.speeds.length>1){
         const pts=state.speeds.map((s,i)=>{const tSec=i*sampleSec; return {x:padL+Math.min(tSec/state.duration,1)*plotW, y:padT+plotH-Math.min((s/effectiveMax)*plotH,plotH)};});
         const buildPath=()=>{ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++){const p=pts[i-1],cc=pts[i]; const cx=(p.x+cc.x)/2; ctx.bezierCurveTo(cx,p.y,cx,cc.y,cc.x,cc.y);}};
