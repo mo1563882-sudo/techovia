@@ -1,0 +1,20 @@
+[
+  {
+    "id": "neon-dark",
+    "name": "Neon Dark",
+    "file": "",
+    "colors": ["#080B14", "#3B82F6", "#F9FAFB"]
+  },
+  {
+    "id": "light",
+    "name": "Light",
+    "file": "./themes/theme-light.css",
+    "colors": ["#F3F4F6", "#2563EB", "#111827"]
+  },
+  {
+    "id": "emerald",
+    "name": "Emerald",
+    "file": "./themes/theme-emerald.css",
+    "colors": ["#06120E", "#10B981", "#ECFDF5"]
+  }
+]
