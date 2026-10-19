@@ -2,13 +2,13 @@
   {
     "id": "light",
     "name": "الوضع الفاتح (Light)",
-    "file": "./themes/light.css",
+    "file": "themes/theme-light.css",
     "colors": ["#F3F4F6", "#2563EB", "#111827"]
   },
   {
     "id": "emerald",
     "name": "الزمردي (Emerald)",
-    "file": "./themes/emerald.css",
+    "file": "themes/theme-emerald.css",
     "colors": ["#06120E", "#10B981", "#ECFDF5"]
   }
 ]
