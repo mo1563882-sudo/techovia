@@ -964,6 +964,7 @@ function loadThemes(){
         
         grid.querySelectorAll('.theme-card').forEach(card=>{
             card.addEventListener('click',()=>{
+                
                 const id=card.getAttribute('data-theme-id');
                 const file=card.getAttribute('data-theme-file');
                 
