@@ -907,11 +907,11 @@ function _renderTrends(){
 // ===================== THEME & LANG =====================
 function loadThemes(){
     const themes = [
-        { id: "neon-dark", name: "Neon Dark (الافتراضي)", colors: ["#05080f", "#1D4ED8", "#F9FAFB"] },
-        { id: "light", name: "الوضع الفاتح (Light)", colors: ["#F3F4F6", "#1D4ED8", "#111827"] },
-        { id: "emerald", name: "الزمردي (Emerald)", colors: ["#02140E", "#10B981", "#ECFDF5"] },
-        { id: "charcoal", name: "الفحمي (Charcoal)", colors: ["#0F1115", "#3B82F6", "#F9FAFB"] },
-        { id: "pastel", name: "الباستيل (Pastel)", colors: ["#FAFAFA", "#8B5CF6", "#1F2937"] }
+        { id: "neon-dark", name: "( Neon Dark )", colors: ["#05080f", "#1D4ED8", "#F9FAFB"] },
+        { id: "light", name: " (Light)", colors: ["#F3F4F6", "#1D4ED8", "#111827"] },
+        { id: "emerald", name: " (Emerald)", colors: ["#02140E", "#10B981", "#ECFDF5"] },
+        { id: "charcoal", name: " (Charcoal)", colors: ["#0F1115", "#3B82F6", "#F9FAFB"] },
+        { id: "pastel", name: " (Pastel)", colors: ["#FAFAFA", "#8B5CF6", "#1F2937"] }
     ];
 
     const grid=$('themeGrid'); if(!grid) return;
